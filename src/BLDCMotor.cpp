@@ -403,20 +403,26 @@ void BLDCMotor::move(float new_target) {
   //                        For this reason it is NOT precise when the angles become large.
   //                        Additionally, the way LPF works on angle is a precision issue, and the angle-LPF is a problem
   //                        when switching to a 2-component representation.
-  if( controller!=MotionControlType::angle_openloop && controller!=MotionControlType::velocity_openloop ) 
+  if((controller!=MotionControlType::angle_openloop) && (controller!=MotionControlType::velocity_openloop) \
+      && (controller!=MotionControlType::velocity) && (controller!=MotionControlType::torque))
     shaft_angle = shaftAngle(); // read value even if motor is disabled to keep the monitoring updated but not in openloop mode
+  
   // get angular velocity  TODO the velocity reading probably also shouldn't happen in open loop modes?
-  shaft_velocity = shaftVelocity(); // read value even if motor is disabled to keep the monitoring updated
+  if((controller!=MotionControlType::angle_openloop) && (controller!=MotionControlType::velocity_openloop))
+    shaft_velocity = shaftVelocity(); // read value even if motor is disabled to keep the monitoring updated
+  
 
   // if disabled do nothing
   if(!enabled) return;
   // set internal target variable
   if(_isset(new_target)) target = new_target;
   
-  // calculate the back-emf voltage if KV_rating available U_bemf = vel*(1/KV)
-  if (_isset(KV_rating)) voltage_bemf = shaft_velocity/(KV_rating*_SQRT3)/_RPM_TO_RADS;
-  // estimate the motor current if phase reistance available and current_sense not available
-  if(!current_sense && _isset(phase_resistance)) current.q = (voltage.q - voltage_bemf)/phase_resistance;
+  if((controller!=MotionControlType::angle_openloop) && (controller!=MotionControlType::velocity_openloop)) {
+    // calculate the back-emf voltage if KV_rating available U_bemf = vel*(1/KV)
+    if (_isset(KV_rating)) voltage_bemf = shaft_velocity/(KV_rating*_SQRT3)/_RPM_TO_RADS;
+    // estimate the motor current if phase reistance available and current_sense not available
+    if(!current_sense && _isset(phase_resistance)) current.q = (voltage.q - voltage_bemf)/phase_resistance;
+  }
 
   // upgrade the current based voltage limit
   switch (controller) {
