@@ -22,7 +22,7 @@ MagneticSensorI2CConfig_s AS5048_I2C = {
 //  @param _bit_resolution  bit resolution of the sensor
 //  @param _angle_register_msb  angle read register
 //  @param _bits_used_msb number of used bits in msb
-MagneticSensorI2C::MagneticSensorI2C(uint8_t _chip_address, int _bit_resolution, uint8_t _angle_register_msb, int _bits_used_msb){
+MagneticSensorI2C::MagneticSensorI2C(uint8_t _chip_address, int _bit_resolution, uint8_t _angle_register_msb, int _bits_used_msb) {
   // chip I2C address
   chip_address = _chip_address;
   // angle read register of the magnetic sensor
@@ -42,7 +42,7 @@ MagneticSensorI2C::MagneticSensorI2C(uint8_t _chip_address, int _bit_resolution,
   wire = &Wire;
 }
 
-MagneticSensorI2C::MagneticSensorI2C(MagneticSensorI2CConfig_s config){
+MagneticSensorI2C::MagneticSensorI2C(MagneticSensorI2CConfig_s config) {
   chip_address = config.chip_address; 
 
   // angle read register of the magnetic sensor
@@ -59,10 +59,13 @@ MagneticSensorI2C::MagneticSensorI2C(MagneticSensorI2CConfig_s config){
 }
 
 MagneticSensorI2C MagneticSensorI2C::AS5600() {
-  return {AS5600_I2C};
+  #warning("TLD: the return function read 'return {AS5600_I2C}', which presumably must've worked, but looks truly awful")
+  // eturn(MagneticSensorI2C(AS5600_I2C)); // TLD: explicitely init class?
+  // return({AS5600_I2C}); // throws an error "expected a ';'"
+  return {AS5600_I2C}; // original code (does this work?)
 }
 
-void MagneticSensorI2C::init(TwoWire* _wire){
+void MagneticSensorI2C::init(TwoWire* _wire) {
 
   wire = _wire;
 
@@ -74,16 +77,16 @@ void MagneticSensorI2C::init(TwoWire* _wire){
 
 //  Shaft angle calculation
 //  angle is in radians [rad]
-float MagneticSensorI2C::getSensorAngle(){
+float MagneticSensorI2C::getSensorAngle() {
   // (number of full rotations)*2PI + current sensor angle 
-  return  ( getRawCount() / (float)cpr) * _2PI ;
+  return(( getRawCount() / (float)cpr) * _2PI);
 }
 
 
 
 // function reading the raw counter of the magnetic sensor
-int MagneticSensorI2C::getRawCount(){
-	return (int)MagneticSensorI2C::read(angle_register_msb);
+int MagneticSensorI2C::getRawCount() {
+  return((int)MagneticSensorI2C::read(angle_register_msb));
 }
 
 // I2C functions
@@ -94,26 +97,26 @@ int MagneticSensorI2C::getRawCount(){
 */
 int MagneticSensorI2C::read(uint8_t angle_reg_msb) {
   // read the angle register first MSB then LSB
-	byte readArray[2];
-	uint16_t readValue = 0;
+  byte readArray[2];
+  uint16_t readValue = 0;
   // notify the device that is aboout to be read
-	wire->beginTransmission(chip_address);
-	wire->write(angle_reg_msb);
+  wire->beginTransmission(chip_address);
+  wire->write(angle_reg_msb);
   currWireError = wire->endTransmission(false);
 
   // read the data msb and lsb
-	wire->requestFrom(chip_address, (uint8_t)2);
-	for (byte i=0; i < 2; i++) {
-		readArray[i] = wire->read();
-	}
+  wire->requestFrom(chip_address, (uint8_t)2);
+  for(byte i=0; i < 2; i++) {
+    readArray[i] = wire->read();
+  }
 
   // depending on the sensor architecture there are different combinations of
   // LSB and MSB register used bits
   // AS5600 uses 0..7 LSB and 8..11 MSB
   // AS5048 uses 0..5 LSB and 6..13 MSB
   readValue = ( readArray[1] &  lsb_mask );
-	readValue += ( ( readArray[0] & msb_mask ) << lsb_used );
-	return readValue;
+  readValue += ( ( readArray[0] & msb_mask ) << lsb_used );
+  return(readValue);
 }
 
 /*
@@ -129,15 +132,15 @@ int MagneticSensorI2C::checkBus(byte sda_pin, byte scl_pin) {
   pinMode(sda_pin, INPUT_PULLUP);
   delay(250);
 
-  if (digitalRead(scl_pin) == LOW) {
+  if(digitalRead(scl_pin) == LOW) {
     // Someone else has claimed master!");
-    return 1;
+    return(1);
   }
 
   if(digitalRead(sda_pin) == LOW) {
     // slave is communicating and awaiting clocks, we are blocked
     pinMode(scl_pin, OUTPUT);
-    for (byte i = 0; i < 16; i++) {
+    for(byte i = 0; i < 16; i++) {
       // toggle clock for 2 bytes of data
       digitalWrite(scl_pin, LOW);
       delayMicroseconds(20);
@@ -146,9 +149,9 @@ int MagneticSensorI2C::checkBus(byte sda_pin, byte scl_pin) {
     }
     pinMode(sda_pin, INPUT);
     delayMicroseconds(20);
-    if (digitalRead(sda_pin) == LOW) {
+    if(digitalRead(sda_pin) == LOW) {
       // SDA still blocked
-      return 2;
+      return(2);
     }
     _delay(1000);
   }
@@ -156,5 +159,5 @@ int MagneticSensorI2C::checkBus(byte sda_pin, byte scl_pin) {
   pinMode(sda_pin, INPUT);
   pinMode(scl_pin, INPUT);
 
-  return 0;
+  return(0);
 }

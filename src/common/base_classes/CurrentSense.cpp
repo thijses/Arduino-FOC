@@ -4,7 +4,7 @@
 // get current magnitude 
 //   - absolute  - if no electrical_angle provided 
 //   - signed    - if angle provided
-float CurrentSense::getDCCurrent(float motor_electrical_angle){
+float CurrentSense::getDCCurrent(float motor_electrical_angle) {
     // read current phase currents
     PhaseCurrent_s current = getPhaseCurrents();
     
@@ -21,17 +21,17 @@ float CurrentSense::getDCCurrent(float motor_electrical_angle){
         float ct;
         float st;
         _sincos(motor_electrical_angle, &st, &ct);
-        sign = (ABcurrent.beta*ct - ABcurrent.alpha*st) > 0 ? 1 : -1;  
+        sign = ((ABcurrent.beta*ct - ABcurrent.alpha*st) > 0) ? 1 : -1; // TLD order of operations check
     }
     // return current magnitude
-    return sign*_sqrt(ABcurrent.alpha*ABcurrent.alpha + ABcurrent.beta*ABcurrent.beta);
+    return(sign*_sqrt((ABcurrent.alpha*ABcurrent.alpha) + (ABcurrent.beta*ABcurrent.beta))); // TLD order of operations check
 }
 
 // function used with the foc algorihtm
 //   calculating DQ currents from phase currents
 //   - function calculating park and clarke transform of the phase currents 
 //   - using getPhaseCurrents and getABCurrents internally
-DQCurrent_s CurrentSense::getFOCCurrents(float angle_el){
+DQCurrent_s CurrentSense::getFOCCurrents(float angle_el) {
     // read current phase currents
     PhaseCurrent_s current = getPhaseCurrents();
 
@@ -41,61 +41,61 @@ DQCurrent_s CurrentSense::getFOCCurrents(float angle_el){
     // calculate park transform
     DQCurrent_s return_current = getDQCurrents(ABcurrent,angle_el);
 
-    return return_current;
+    return(return_current);
 }
 
 // function used with the foc algorihtm
 //   calculating Alpha Beta currents from phase currents
 //   - function calculating Clarke transform of the phase currents
-ABCurrent_s CurrentSense::getABCurrents(PhaseCurrent_s current){
+ABCurrent_s CurrentSense::getABCurrents(PhaseCurrent_s current) {
 
     // calculate clarke transform
     float i_alpha, i_beta;
-    if(!current.c){
+    if(!current.c) {
         // if only two measured currents
         i_alpha = current.a;  
-        i_beta = _1_SQRT3 * current.a + _2_SQRT3 * current.b;
-    }else if(!current.a){
+        i_beta = (_1_SQRT3 * current.a) + (_2_SQRT3 * current.b); // TLD order of operations check
+    } else if(!current.a) {
         // if only two measured currents
-        float a = -current.c - current.b;
+        float a = (-current.c) - current.b; // TLD order of operations check
         i_alpha = a;  
-        i_beta = _1_SQRT3 * a + _2_SQRT3 * current.b;
-    }else if(!current.b){
+        i_beta = (_1_SQRT3 * a) + (_2_SQRT3 * current.b); // TLD order of operations check
+    } else if(!current.b) {
         // if only two measured currents
-        float b = -current.a - current.c;
+        float b = (-current.a) - current.c;
         i_alpha = current.a;  
-        i_beta = _1_SQRT3 * current.a + _2_SQRT3 * b;
+        i_beta = (_1_SQRT3 * current.a) + (_2_SQRT3 * b); // TLD order of operations check
     } else {
         // signal filtering using identity a + b + c = 0. Assumes measurement error is normally distributed.
         float mid = (1.f/3) * (current.a + current.b + current.c);
         float a = current.a - mid;
         float b = current.b - mid;
         i_alpha = a;
-        i_beta = _1_SQRT3 * a + _2_SQRT3 * b;
+        i_beta = (_1_SQRT3 * a) + (_2_SQRT3 * b); // TLD order of operations check
     }
 
     ABCurrent_s return_ABcurrent;
     return_ABcurrent.alpha = i_alpha;
     return_ABcurrent.beta = i_beta;
-    return return_ABcurrent;
+    return(return_ABcurrent);
 }
 
 // function used with the foc algorihtm
 //   calculating D and Q currents from Alpha Beta currents and electrical angle
 //   - function calculating Clarke transform of the phase currents
-DQCurrent_s CurrentSense::getDQCurrents(ABCurrent_s current, float angle_el){
+DQCurrent_s CurrentSense::getDQCurrents(ABCurrent_s current, float angle_el) {
  // calculate park transform
     float ct;
     float st;
     _sincos(angle_el, &st, &ct);
     DQCurrent_s return_current;
-    return_current.d = current.alpha * ct + current.beta * st;
-    return_current.q = current.beta * ct - current.alpha * st;
+    return_current.d = (current.alpha * ct) + (current.beta * st); // TLD order of operations check
+    return_current.q = (current.beta * ct) - (current.alpha * st); // TLD order of operations check
     return return_current;
 }
 
 /**
-	Driver linking to the current sense
+  Driver linking to the current sense
 */
 void CurrentSense::linkDriver(BLDCDriver* _driver) {
   driver = _driver;

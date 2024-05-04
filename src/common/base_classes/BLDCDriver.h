@@ -12,7 +12,7 @@ enum PhaseState : uint8_t {
 };
 
 
-class BLDCDriver{
+class BLDCDriver {
     public:
 
         /** Initialise hardware */

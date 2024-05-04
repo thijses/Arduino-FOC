@@ -42,7 +42,7 @@ enum Pullup : uint8_t {
  * 
  */
 class Sensor{
-	friend class SmoothingSensor;
+  friend class SmoothingSensor;
     public:
         /**
          * Get mechanical shaft angle in the range 0 to 2PI. This value will be as precise as possible with

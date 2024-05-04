@@ -16,9 +16,9 @@
 #define DEAD_TIME (DEAD_ZONE  / (PWM_RESOLUTION * 0.25 * 62.5)) // 62.5ns resolution of PWM
 
 #ifdef NRF_PWM3
-#define PWM_COUNT 4
+  #define PWM_COUNT 4
 #else
-#define PWM_COUNT 3
+  #define PWM_COUNT 3
 #endif
 
 // empty motor slot 
@@ -33,7 +33,7 @@ static NRF_PWM_Type* pwms[PWM_COUNT] = {
   NRF_PWM1,
   NRF_PWM2,
   #ifdef  NRF_PWM3
-  NRF_PWM3
+    NRF_PWM3
   #endif
 };
 
@@ -94,7 +94,7 @@ typedef struct NRF52DriverParams {
 
 
 // configuring high frequency pwm timer
-void _configureHwPwm(NRF_PWM_Type* mcpwm1,  NRF_PWM_Type* mcpwm2){
+void _configureHwPwm(NRF_PWM_Type* mcpwm1,  NRF_PWM_Type* mcpwm2) {
 
   mcpwm1->ENABLE = (PWM_ENABLE_ENABLE_Enabled << PWM_ENABLE_ENABLE_Pos);
   mcpwm1->PRESCALER = (PWM_PRESCALER_PRESCALER_DIV_1 << PWM_PRESCALER_PRESCALER_Pos);
@@ -105,7 +105,7 @@ void _configureHwPwm(NRF_PWM_Type* mcpwm1,  NRF_PWM_Type* mcpwm2){
   mcpwm1->SEQ[0].REFRESH  = 0;
   mcpwm1->SEQ[0].ENDDELAY = 0;
 
-  if(mcpwm1 != mcpwm2){
+  if(mcpwm1 != mcpwm2) {
     mcpwm2->ENABLE = (PWM_ENABLE_ENABLE_Enabled << PWM_ENABLE_ENABLE_Pos);
     mcpwm2->PRESCALER = (PWM_PRESCALER_PRESCALER_DIV_1 << PWM_PRESCALER_PRESCALER_Pos);
     mcpwm2->MODE = (PWM_MODE_UPDOWN_UpAndDown << PWM_MODE_UPDOWN_Pos); 
@@ -114,7 +114,7 @@ void _configureHwPwm(NRF_PWM_Type* mcpwm1,  NRF_PWM_Type* mcpwm2){
     mcpwm2->DECODER = ((uint32_t)PWM_DECODER_LOAD_Individual << PWM_DECODER_LOAD_Pos) | ((uint32_t)PWM_DECODER_MODE_RefreshCount << PWM_DECODER_MODE_Pos);
     mcpwm2->SEQ[0].REFRESH  = 0;
     mcpwm2->SEQ[0].ENDDELAY = 0;
-  }else{
+  } else {
     mcpwm1->MODE = (PWM_MODE_UPDOWN_Up << PWM_MODE_UPDOWN_Pos);
   }
 }
@@ -123,7 +123,7 @@ void _configureHwPwm(NRF_PWM_Type* mcpwm1,  NRF_PWM_Type* mcpwm2){
 
 // can we support it using the generic driver on this MCU? Commented out to fall back to generic driver for 2-pwm
 // void* _configure2PWM(long pwm_frequency, const int pinA, const int pinB) {
-//   return SIMPLEFOC_DRIVER_INIT_FAILED; // not supported
+//   return(SIMPLEFOC_DRIVER_INIT_FAILED); // not supported
 // }
 
 
@@ -134,8 +134,8 @@ void _configureHwPwm(NRF_PWM_Type* mcpwm1,  NRF_PWM_Type* mcpwm2){
 // - hardware speciffic
 void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const int pinC) {
 
-  if( !pwm_frequency || pwm_frequency == NOT_SET) pwm_frequency = PWM_FREQ; // default frequency 20khz for a resolution of 800
-  else pwm_frequency = _constrain(pwm_frequency, 0, PWM_MAX_FREQ); // constrain to 62.5kHz max for a resolution of 256  
+  if( (!pwm_frequency) || (pwm_frequency == NOT_SET)) { pwm_frequency = PWM_FREQ; } // default frequency 20kHz for a resolution of 800 // TLD order of operations check
+  else { pwm_frequency = _constrain(pwm_frequency, 0, PWM_MAX_FREQ); } // constrain to 62.5kHz max for a resolution of 256  
 
   pwm_range = (PWM_CLK / pwm_frequency);
   
@@ -146,23 +146,23 @@ void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const in
   // determine which motor are we connecting
   // and set the appropriate configuration parameters 
   int slot_num;
-  for(slot_num = 0; slot_num < 4; slot_num++){
-    if(nrf52_bldc_3pwm_motor_slots[slot_num].pinA == _EMPTY_SLOT){ // put the new motor in the first empty slot
+  for(slot_num = 0; slot_num < 4; slot_num++) {
+    if(nrf52_bldc_3pwm_motor_slots[slot_num].pinA == _EMPTY_SLOT) { // put the new motor in the first empty slot
       nrf52_bldc_3pwm_motor_slots[slot_num].pinA = pinA;
       break;
     }
   }
   // if no slots available
-  if(slot_num >= 4) return SIMPLEFOC_DRIVER_INIT_FAILED;
+  if(slot_num >= 4) { return(SIMPLEFOC_DRIVER_INIT_FAILED); }
 
   // disable all the slots with the same MCPWM 
-  if(slot_num < 2){
+  if(slot_num < 2) {
     // slot 0 of the stepper
     nrf52_stepper_motor_slots[slot_num].pin1A = _TAKEN_SLOT;
     // slot 0 of the 6pwm bldc
     nrf52_bldc_6pwm_motor_slots[0].pinAH = _TAKEN_SLOT;
     //NRF_PPI->CHEN &= ~1UL;
-  }else{
+  } else {
     // slot 1 of the stepper
     nrf52_stepper_motor_slots[slot_num].pin1A = _TAKEN_SLOT;
     // slot 0 of the 6pwm bldc
@@ -185,7 +185,7 @@ void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const in
   NRF52DriverParams* params = new NRF52DriverParams();
   params->slot.slot3pwm = &(nrf52_bldc_3pwm_motor_slots[slot_num]);
   params->pwm_frequency = pwm_frequency;
-  return params;
+  return(params);
 }
 
 
@@ -196,8 +196,8 @@ void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const in
 // - hardware speciffic
 void* _configure4PWM(long pwm_frequency, const int pinA, const int pinB, const int pinC, const int pinD) {
 
-  if( !pwm_frequency || pwm_frequency == NOT_SET) pwm_frequency = PWM_FREQ; // default frequency 20khz for a resolution of 800
-  else pwm_frequency = _constrain(pwm_frequency, 0, PWM_MAX_FREQ); // constrain to 62.5kHz max for a resolution of 256
+  if( (!pwm_frequency) || (pwm_frequency == NOT_SET)) { pwm_frequency = PWM_FREQ; } // default frequency 20khz for a resolution of 800 // TLD order of operations check
+  else { pwm_frequency = _constrain(pwm_frequency, 0, PWM_MAX_FREQ); } // constrain to 62.5kHz max for a resolution of 256
 
   pwm_range = (PWM_CLK / pwm_frequency);
   
@@ -209,23 +209,23 @@ void* _configure4PWM(long pwm_frequency, const int pinA, const int pinB, const i
   // determine which motor are we connecting
   // and set the appropriate configuration parameters 
   int slot_num;
-  for(slot_num = 0; slot_num < 4; slot_num++){
-    if(nrf52_stepper_motor_slots[slot_num].pin1A == _EMPTY_SLOT){ // put the new motor in the first empty slot
+  for(slot_num = 0; slot_num < 4; slot_num++) {
+    if(nrf52_stepper_motor_slots[slot_num].pin1A == _EMPTY_SLOT) { // put the new motor in the first empty slot
       nrf52_stepper_motor_slots[slot_num].pin1A = pinA;
       break;
     }
   }
   // if no slots available
-  if (slot_num >= 4) return SIMPLEFOC_DRIVER_INIT_FAILED;
+  if(slot_num >= 4) { return(SIMPLEFOC_DRIVER_INIT_FAILED); }
 
   // disable all the slots with the same MCPWM 
-  if (slot_num < 2){
+  if(slot_num < 2) {
     // slots 0 and 1 of the 3pwm bldc
     nrf52_bldc_3pwm_motor_slots[slot_num].pinA = _TAKEN_SLOT;
     // slot 0 of the 6pwm bldc
     nrf52_bldc_6pwm_motor_slots[0].pinAH = _TAKEN_SLOT;
     //NRF_PPI->CHEN &= ~1UL;
-  }else{
+  } else {
     // slots 2 and 3 of the 3pwm bldc
     nrf52_bldc_3pwm_motor_slots[slot_num].pinA = _TAKEN_SLOT;
     // slot 1 of the 6pwm bldc
@@ -249,7 +249,7 @@ void* _configure4PWM(long pwm_frequency, const int pinA, const int pinB, const i
   NRF52DriverParams* params = new NRF52DriverParams();
   params->slot.slotstep = &(nrf52_stepper_motor_slots[slot_num]);
   params->pwm_frequency = pwm_frequency;
-  return params;  
+  return(params);  
 }
 
 
@@ -258,7 +258,7 @@ void* _configure4PWM(long pwm_frequency, const int pinA, const int pinB, const i
 // function setting the pwm duty cycle to the hardware
 // - BLDC motor - 3PWM setting
 // - hardware speciffic
-void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params){
+void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params) {
   // transform duty cycle from [0,1] to [0,range]
   bldc_3pwm_motor_slots_t* p = ((NRF52DriverParams*)params)->slot.slot3pwm;
   p->mcpwm_channel_sequence[0] = (int)(dc_a * pwm_range) | 0x8000;
@@ -274,7 +274,7 @@ void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params){
 // function setting the pwm duty cycle to the hardware
 // - Stepper motor - 4PWM setting
 // - hardware speciffic
-void _writeDutyCycle4PWM(float dc_1a,  float dc_1b, float dc_2a, float dc_2b, void* params){
+void _writeDutyCycle4PWM(float dc_1a,  float dc_1b, float dc_2a, float dc_2b, void* params) {
 
   stepper_motor_slots_t* p = ((NRF52DriverParams*)params)->slot.slotstep;
   p->mcpwm_channel_sequence[0] = (int)(dc_1a * pwm_range) | 0x8000;
@@ -289,18 +289,18 @@ void _writeDutyCycle4PWM(float dc_1a,  float dc_1b, float dc_2a, float dc_2b, vo
 // - BLDC driver - 6PWM setting
 // - hardware specific
 */
-void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, const int pinA_l,  const int pinB_h, const int pinB_l, const int pinC_h, const int pinC_l){
+void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, const int pinA_l,  const int pinB_h, const int pinB_l, const int pinC_h, const int pinC_l) {
   
-  if( !pwm_frequency || pwm_frequency == NOT_SET) pwm_frequency = PWM_FREQ; // default frequency 20khz - centered pwm has twice lower frequency for a resolution of 400
-  else pwm_frequency = _constrain(pwm_frequency*2, 0, PWM_MAX_FREQ); // constrain to 62.5kHz max => 31.25kHz for a resolution of 256  
+  if( (!pwm_frequency) || (pwm_frequency == NOT_SET)) { pwm_frequency = PWM_FREQ; } // default frequency 20khz - centered pwm has twice lower frequency for a resolution of 400 // TLD order of operations check
+  else { pwm_frequency = _constrain(pwm_frequency*2, 0, PWM_MAX_FREQ); } // constrain to 62.5kHz max => 31.25kHz for a resolution of 256  
 
   pwm_range = (PWM_CLK / pwm_frequency);
   pwm_range /= 2; // scale the frequency (centered PWM)
 
   float dead_time;
-  if (dead_zone != NOT_SET){
+  if(dead_zone != NOT_SET) {
     dead_time = dead_zone/2;
-  }else{
+  } else {
     dead_time = DEAD_TIME/2; 
   }
   
@@ -315,24 +315,24 @@ void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, cons
   // determine which motor are we connecting
   // and set the appropriate configuration parameters 
   int slot_num;
-  for(slot_num = 0; slot_num < 2; slot_num++){
-    if(nrf52_bldc_6pwm_motor_slots[slot_num].pinAH == _EMPTY_SLOT){ // put the new motor in the first empty slot
+  for(slot_num = 0; slot_num < 2; slot_num++) {
+    if(nrf52_bldc_6pwm_motor_slots[slot_num].pinAH == _EMPTY_SLOT) { // put the new motor in the first empty slot
       nrf52_bldc_6pwm_motor_slots[slot_num].pinAH = pinA_h;
       break;
     }
   }
   // if no slots available
-  if(slot_num >= 2) return SIMPLEFOC_DRIVER_INIT_FAILED;
+  if(slot_num >= 2) { return(SIMPLEFOC_DRIVER_INIT_FAILED); }
 
   // disable all the slots with the same MCPWM 
-  if( slot_num == 0 ){
+  if( slot_num == 0 ) {
     // slots 0 and 1 of the 3pwm bldc
     nrf52_bldc_3pwm_motor_slots[0].pinA = _TAKEN_SLOT;
     nrf52_bldc_3pwm_motor_slots[1].pinA = _TAKEN_SLOT;
     // slot 0 and 1 of the stepper
     nrf52_stepper_motor_slots[0].pin1A = _TAKEN_SLOT;
     nrf52_stepper_motor_slots[1].pin1A = _TAKEN_SLOT;
-  }else{
+  } else {
     // slots 2 and 3 of the 3pwm bldc
     nrf52_bldc_3pwm_motor_slots[2].pinA = _TAKEN_SLOT;
     nrf52_bldc_3pwm_motor_slots[3].pinA = _TAKEN_SLOT;
@@ -369,7 +369,7 @@ void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, cons
   params->slot.slot6pwm = &(nrf52_bldc_6pwm_motor_slots[slot_num]);
   params->pwm_frequency = pwm_frequency;
   params->dead_time = dead_time;
-  return params; 
+  return(params); 
 }
 
 
@@ -379,7 +379,7 @@ void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, cons
 //  - BLDC driver - 6PWM setting
 //  - hardware specific
 */
-void _writeDutyCycle6PWM(float dc_a,  float dc_b, float dc_c, PhaseState *phase_state, void* params){
+void _writeDutyCycle6PWM(float dc_a,  float dc_b, float dc_c, PhaseState *phase_state, void* params) {
       bldc_6pwm_motor_slots_t* p = ((NRF52DriverParams*)params)->slot.slot6pwm;
       float dead_time = ((NRF52DriverParams*)params)->dead_time;
       p->mcpwm_channel_sequence[0] = (int)(_constrain(dc_a-dead_time,0,1)*pwm_range) | 0x8000;

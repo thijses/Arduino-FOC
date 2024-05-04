@@ -10,8 +10,7 @@
 /**
  6 pwm bldc driver class
 */
-class BLDCDriver6PWM: public BLDCDriver
-{
+class BLDCDriver6PWM: public BLDCDriver {
   public:
     /**
       BLDCDriver class constructor
@@ -26,16 +25,16 @@ class BLDCDriver6PWM: public BLDCDriver
     BLDCDriver6PWM(int phA_h,int phA_l,int phB_h,int phB_l,int phC_h,int phC_l, int en = NOT_SET);
     
     /**  Motor hardware init function */
-  	int init() override;
+    int init() override;
     /** Motor disable function */
-  	void disable() override;
+    void disable() override;
     /** Motor enable function */
     void enable() override;
 
     // hardware variables
-  	int pwmA_h,pwmA_l; //!< phase A pwm pin number
-  	int pwmB_h,pwmB_l; //!< phase B pwm pin number
-  	int pwmC_h,pwmC_l; //!< phase C pwm pin number
+    int pwmA_h,pwmA_l; //!< phase A pwm pin number
+    int pwmB_h,pwmB_l; //!< phase B pwm pin number
+    int pwmC_h,pwmC_l; //!< phase C pwm pin number
     int enable_pin; //!< enable pin number
     bool enable_active_high = true;
 

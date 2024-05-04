@@ -95,50 +95,50 @@
 #define TPM1_CH1_PIN 17
 #endif
 
-int _findTimer( const int Ah, const int Al,  const int Bh, const int Bl, const int Ch, const int Cl){
+int _findTimer( const int Ah, const int Al,  const int Bh, const int Bl, const int Ch, const int Cl) {
 
-  if((Ah == FTM0_CH0_PIN && Al == FTM0_CH1_PIN) || 
-    (Ah == FTM0_CH2_PIN && Al == FTM0_CH3_PIN) ||
-    (Ah == FTM0_CH4_PIN && Al == FTM0_CH5_PIN) ){
-      if((Bh == FTM0_CH0_PIN && Bl == FTM0_CH1_PIN) || 
-        (Bh == FTM0_CH2_PIN && Bl == FTM0_CH3_PIN) ||
-        (Bh == FTM0_CH4_PIN && Bl == FTM0_CH5_PIN) ){
-         if((Ch == FTM0_CH0_PIN && Cl == FTM0_CH1_PIN) || 
-          (Ch == FTM0_CH2_PIN && Cl == FTM0_CH3_PIN) ||
-          (Ch == FTM0_CH4_PIN && Cl == FTM0_CH5_PIN) ){
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-                SIMPLEFOC_DEBUG("TEENSY-DRV: Using timer FTM0.");
-#endif
-            // timer FTM0 
-            return 0;
-        }
+  if(((Ah == FTM0_CH0_PIN) && (Al == FTM0_CH1_PIN)) || 
+    ((Ah == FTM0_CH2_PIN) && (Al == FTM0_CH3_PIN)) ||
+    ((Ah == FTM0_CH4_PIN) && (Al == FTM0_CH5_PIN)) ) { // TLD order of operations check
+    if(((Bh == FTM0_CH0_PIN) && (Bl == FTM0_CH1_PIN)) || 
+      ((Bh == FTM0_CH2_PIN) && (Bl == FTM0_CH3_PIN)) ||
+      ((Bh == FTM0_CH4_PIN) && (Bl == FTM0_CH5_PIN)) ) { // TLD order of operations check
+        if(((Ch == FTM0_CH0_PIN) && (Cl == FTM0_CH1_PIN)) || 
+        ((Ch == FTM0_CH2_PIN) && (Cl == FTM0_CH3_PIN)) ||
+        ((Ch == FTM0_CH4_PIN) && (Cl == FTM0_CH5_PIN)) ) { // TLD order of operations check
+        #ifdef SIMPLEFOC_TEENSY_DEBUG
+          SIMPLEFOC_DEBUG("TEENSY-DRV: Using timer FTM0.");
+        #endif
+        // timer FTM0 
+        return(0);
       }
+    }
   }
 
-#ifdef FTM3_CH0_PIN // if the board has FTM3 timer
-    if((Ah == FTM3_CH0_PIN && Al == FTM3_CH1_PIN) || 
-      (Ah == FTM3_CH2_PIN && Al == FTM3_CH3_PIN) ||
-      (Ah == FTM3_CH4_PIN && Al == FTM3_CH5_PIN) ){
-        if((Bh == FTM3_CH0_PIN && Bl == FTM3_CH1_PIN) || 
-          (Bh == FTM3_CH2_PIN && Bl == FTM3_CH3_PIN) ||
-          (Bh == FTM3_CH4_PIN && Bl == FTM3_CH5_PIN) ){
-          if((Ch == FTM3_CH0_PIN && Cl == FTM3_CH1_PIN) || 
-            (Ch == FTM3_CH2_PIN && Cl == FTM3_CH3_PIN) ||
-            (Ch == FTM3_CH4_PIN && Cl == FTM3_CH5_PIN) ){
-              // timer FTM3 
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-                SIMPLEFOC_DEBUG("TEENSY-DRV: Using timer FTM3.");
-#endif
-              return 3;
-          }
+  #ifdef FTM3_CH0_PIN // if the board has FTM3 timer
+    if(((Ah == FTM3_CH0_PIN) && (Al == FTM3_CH1_PIN)) || 
+      ((Ah == FTM3_CH2_PIN) && (Al == FTM3_CH3_PIN)) ||
+      ((Ah == FTM3_CH4_PIN) && (Al == FTM3_CH5_PIN)) ) { // TLD order of operations check
+      if(((Bh == FTM3_CH0_PIN) && (Bl == FTM3_CH1_PIN)) || 
+        ((Bh == FTM3_CH2_PIN) && (Bl == FTM3_CH3_PIN)) ||
+        ((Bh == FTM3_CH4_PIN) && (Bl == FTM3_CH5_PIN)) ) { // TLD order of operations check
+        if(((Ch == FTM3_CH0_PIN) && (Cl == FTM3_CH1_PIN)) || 
+          ((Ch == FTM3_CH2_PIN) && (Cl == FTM3_CH3_PIN)) ||
+          ((Ch == FTM3_CH4_PIN) && (Cl == FTM3_CH5_PIN)) ) { // TLD order of operations check
+          // timer FTM3 
+          #ifdef SIMPLEFOC_TEENSY_DEBUG
+            SIMPLEFOC_DEBUG("TEENSY-DRV: Using timer FTM3.");
+          #endif
+          return(3);
         }
+      }
     }
-#endif
+  #endif
   
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-  SIMPLEFOC_DEBUG("TEENSY-DRV: ERR: Pins not on timers FTM0 or FTM3!");
-#endif
-  return -1;
+  #ifdef SIMPLEFOC_TEENSY_DEBUG
+    SIMPLEFOC_DEBUG("TEENSY-DRV: ERR: Pins not on timers FTM0 or FTM3!");
+  #endif
+  return(-1);
 
 }
 
@@ -147,8 +147,8 @@ int _findTimer( const int Ah, const int Al,  const int Bh, const int Bl, const i
 // - Stepper motor - 6PWM setting
 // - hardware specific
 void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, const int pinA_l,  const int pinB_h, const int pinB_l, const int pinC_h, const int pinC_l) {
-  if(!pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 25khz
-  else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to 50kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency)) ) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 25khz // TLD order of operations check
+  else { pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); } // constrain to 50kHz max
   unsigned long pwm_freq = 2*pwm_frequency; // center-aligned pwm has 4 times lower freq
   _setHighFrequency(pwm_freq, pinA_h);
   _setHighFrequency(pwm_freq, pinA_l);
@@ -164,20 +164,20 @@ void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, cons
 
 
   int timer = _findTimer(pinA_h,pinA_l,pinB_h,pinB_l,pinC_h,pinC_l);
-  if(timer<0) return SIMPLEFOC_DRIVER_INIT_FAILED;
+  if(timer<0) { return(SIMPLEFOC_DRIVER_INIT_FAILED); }
 
   // find the best combination of prescalers and counter value
   double dead_time = dead_zone/pwm_freq;
   int prescaler = 1; // initial prescaler (1,4 or 16)
   double count = 1; // inital count (1 - 63)
-  for (; prescaler<=16; prescaler*=4){
+  for(; prescaler<=16; prescaler*=4) {
     count = dead_time*((double)F_CPU)/((double)prescaler);
-    if(count < 64) break; // found the solution
+    if(count < 64) { break; } // found the solution
   }
   count = _constrain(count, 1, 63);
 
   // configure the timer 
-  if(timer==0){
+  if(timer==0) {
     // Configure FTM0
     // // inverting and deadtime insertion for FTM1
     FTM0_COMBINE = 0x00121212; // 0x2 - complemetary mode, 0x1 - dead timer insertion enabled
@@ -188,7 +188,7 @@ void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, cons
 
     // configure center aligned PWM
     FTM0_SC = 0x00000028; // 0x2 - center-alignment, 0x8 - fixed clock freq
-  }else if(timer==3){
+  } else if(timer==3) {
     // Configure FTM3
     // inverting and deadtime insertion for FTM1
     FTM3_COMBINE = 0x00121212; // 0x2 - complemetary mode, 0x1 - dead timer insertion enabled
@@ -201,7 +201,7 @@ void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, cons
     FTM3_SC = 0x00000028; // 0x2 - center-alignment, 0x8 - fixed clock freq
   }
   
-  return params;
+  return(params);
 }
 
 
@@ -209,7 +209,7 @@ void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, cons
 // function setting the pwm duty cycle to the hardware
 // - Stepper motor - 6PWM setting
 // - hardware specific
-void _writeDutyCycle6PWM(float dc_a,  float dc_b, float dc_c, PhaseState *phase_state, void* params){
+void _writeDutyCycle6PWM(float dc_a,  float dc_b, float dc_c, PhaseState *phase_state, void* params) {
   _UNUSED(phase_state);
   // transform duty cycle from [0,1] to [0,255]
   // phase A

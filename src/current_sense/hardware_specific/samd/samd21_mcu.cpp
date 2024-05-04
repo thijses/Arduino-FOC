@@ -10,8 +10,7 @@ static uint16_t a = 0xFFFF, b = 0xFFFF, c = 0xFFFF; // updated by adcStopWithDMA
 static SAMDCurrentSenseADCDMA instance;
 
 // function configuring low-side current sensing 
-void* _configureADCLowSide(const void* driver_params, const int pinA,const int pinB,const int pinC)
-{
+void* _configureADCLowSide(const void* driver_params, const int pinA,const int pinB,const int pinC) {
   _UNUSED(driver_params);
 
   _pinA = pinA;
@@ -24,10 +23,9 @@ void* _configureADCLowSide(const void* driver_params, const int pinA,const int p
     .pins = { pinA, pinB, pinC }
   };
 
-  return params;
+  return(params);
 }
-void _startADC3PinConversionLowSide()
-{
+void _startADC3PinConversionLowSide() {
   instance.startADCScan();
 }
 /**
@@ -35,27 +33,28 @@ void _startADC3PinConversionLowSide()
  * 
  * @param pinA - the arduino pin to be read (it has to be ADC pin)
  */
-float _readADCVoltageLowSide(const int pinA, const void* cs_params)
-{
+float _readADCVoltageLowSide(const int pinA, const void* cs_params) {
   _UNUSED(cs_params);
 
   instance.readResults(a, b, c);
   
-  if(pinA == _pinA)
-    return instance.toVolts(a);
-  if(pinA == _pinB)
-    return instance.toVolts(b);
-  if(pinA == _pinC)
-    return instance.toVolts(c);
+  if(pinA == _pinA) {
+    return(instance.toVolts(a));
+  }
+  if(pinA == _pinB) {
+    return(instance.toVolts(b));
+  }
+  if(pinA == _pinC) {
+    return(instance.toVolts(c));
+  }
 
-  return NAN;
+  return(NAN);
 }
 
 /**
  *  function syncing the Driver with the ADC  for the LowSide Sensing
  */
-void _driverSyncLowSide(void* driver_params, void* cs_params)
-{
+void _driverSyncLowSide(void* driver_params, void* cs_params) {
   _UNUSED(driver_params);
   _UNUSED(cs_params);
 
@@ -89,18 +88,13 @@ static void   ADCsync() {
 
 //  ADC DMA sequential free running (6) with Interrupts /////////////////
 
-SAMDCurrentSenseADCDMA * SAMDCurrentSenseADCDMA::getHardwareAPIInstance() 
-{
-  
-  return &instance;
+SAMDCurrentSenseADCDMA * SAMDCurrentSenseADCDMA::getHardwareAPIInstance() {
+  return(&instance);
 }
 
-SAMDCurrentSenseADCDMA::SAMDCurrentSenseADCDMA()
-{
-}
+SAMDCurrentSenseADCDMA::SAMDCurrentSenseADCDMA() { }
 
-void SAMDCurrentSenseADCDMA::init(int pinA, int pinB, int pinC, int pinAREF, float voltageAREF, uint32_t adcBits, uint32_t channelDMA)
-{
+void SAMDCurrentSenseADCDMA::init(int pinA, int pinB, int pinC, int pinAREF, float voltageAREF, uint32_t adcBits, uint32_t channelDMA) {
   this->pinA = pinA;
   this->pinB = pinB;
   this->pinC = pinC;
@@ -117,14 +111,15 @@ void SAMDCurrentSenseADCDMA::init(int pinA, int pinB, int pinC, int pinAREF, flo
 }
 
 
-void SAMDCurrentSenseADCDMA::startADCScan(){
+void SAMDCurrentSenseADCDMA::startADCScan() {
   adcToDMATransfer(adcBuffer + oneBeforeFirstAIN, BufferSize);
   adcStartWithDMA();
 }
 
-bool SAMDCurrentSenseADCDMA::readResults(uint16_t & a, uint16_t & b, uint16_t & c){
-  if(ADC->CTRLA.bit.ENABLE)
-    return false;
+bool SAMDCurrentSenseADCDMA::readResults(uint16_t & a, uint16_t & b, uint16_t & c) {
+  if(ADC->CTRLA.bit.ENABLE) {
+    return(false);
+  }
   uint32_t ainA = g_APinDescription[pinA].ulADCChannelNumber;
   uint32_t ainB = g_APinDescription[pinB].ulADCChannelNumber;
   a = adcBuffer[ainA];
@@ -134,18 +129,19 @@ bool SAMDCurrentSenseADCDMA::readResults(uint16_t & a, uint16_t & b, uint16_t & 
     uint32_t ainC = g_APinDescription[pinC].ulADCChannelNumber;
     c = adcBuffer[ainC];
   }
-  return true;
+  return(true);
 }
 
 
 float SAMDCurrentSenseADCDMA::toVolts(uint16_t counts) {
-  return counts * countsToVolts;
+  return(counts * countsToVolts);
 }
 
-void SAMDCurrentSenseADCDMA::initPins(){
+void SAMDCurrentSenseADCDMA::initPins() {
   
-  if (pinAREF>=0)
+  if(pinAREF>=0) {
     pinMode(pinAREF, INPUT);
+  }
   pinMode(pinA, INPUT);
   pinMode(pinB, INPUT);
 
@@ -153,8 +149,7 @@ void SAMDCurrentSenseADCDMA::initPins(){
   uint32_t ainB = g_APinDescription[pinB].ulADCChannelNumber;
   firstAIN = min(ainA, ainB);
   lastAIN = max(ainA, ainB);
-  if( _isset(pinC) ) 
-  {
+  if( _isset(pinC) ) {
     uint32_t ainC = g_APinDescription[pinC].ulADCChannelNumber;
     pinMode(pinC, INPUT);
     firstAIN = min(firstAIN, ainC);
@@ -166,7 +161,7 @@ void SAMDCurrentSenseADCDMA::initPins(){
 
 }
 
-void SAMDCurrentSenseADCDMA::initADC(){
+void SAMDCurrentSenseADCDMA::initADC() {
 
   analogRead(pinA);  // do some pin init  pinPeripheral() 
   analogRead(pinB);  // do some pin init  pinPeripheral() 
@@ -177,10 +172,11 @@ void SAMDCurrentSenseADCDMA::initADC(){
   //ADC->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_INTVCC0_Val; //  2.2297 V Supply VDDANA
   ADC->INPUTCTRL.bit.GAIN = ADC_INPUTCTRL_GAIN_1X_Val; // Gain select as 1X
   // ADC->INPUTCTRL.bit.GAIN = ADC_INPUTCTRL_GAIN_DIV2_Val;  // default
-  if (pinAREF>=0)
+  if(pinAREF>=0) {
     ADC->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_AREFA;
-  else
+  } else {
     ADC->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_INTVCC0;
+  }
   ADCsync();  //  ref 31.6.16
 
   /*
@@ -276,7 +272,7 @@ void SAMDCurrentSenseADCDMA::adcToDMATransfer(void *rxdata,  uint32_t hwords) {
 
 int iii = 0;
 
-void adcStopWithDMA(void){
+void adcStopWithDMA(void) {
   ADCsync();
   ADC->CTRLA.bit.ENABLE = 0x00;
   // ADCsync();
@@ -293,7 +289,7 @@ void adcStopWithDMA(void){
 
 }
 
-void adcStartWithDMA(void){
+void adcStartWithDMA(void) {
   ADCsync();
   ADC->INPUTCTRL.bit.INPUTOFFSET = 0;
   ADCsync();

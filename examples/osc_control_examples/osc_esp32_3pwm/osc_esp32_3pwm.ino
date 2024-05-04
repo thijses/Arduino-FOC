@@ -49,8 +49,8 @@
 #include <Math.h>
 
 
-const char ssid[] = "myssid";		// your network SSID (name)
-const char pass[] = "mypassword";	// your network password
+const char ssid[] = "myssid";    // your network SSID (name)
+const char pass[] = "mypassword";  // your network password
 WiFiUDP Udp;
 IPAddress outIp(192,168,1,17);        // remote IP (not needed for receive)
 const unsigned int outPort = 8000;    // remote port (not needed for receive)
@@ -67,15 +67,15 @@ BLDCDriver3PWM driver =  BLDCDriver3PWM(25, 26, 27);
 Commander command = Commander(Serial);
 
 void setup() {
-	Serial.begin(115200);
+  Serial.begin(115200);
 
-	WiFi.begin(ssid, pass);
+  WiFi.begin(ssid, pass);
 
     Serial.print("Connecting WiFi ");
     Serial.println(ssid);
     while (WiFi.status() != WL_CONNECTED) {
-    	delay(500);
-    	Serial.print(".");
+      delay(500);
+      Serial.print(".");
     }
     Udp.begin(inPort);
     Serial.println();
@@ -85,25 +85,25 @@ void setup() {
     Serial.println(inPort);
 
     delay(2000);
-	Serial.println("Initializing motor.");
+  Serial.println("Initializing motor.");
 
-	sensor.init();
-	motor.linkSensor(&sensor);
-	driver.voltage_power_supply = 9;
-	driver.init();
-	motor.linkDriver(&driver);
-	motor.controller = MotionControlType::velocity;
-	motor.PID_velocity.P = 0.2f;
-	motor.PID_velocity.I = 20;
-	motor.PID_velocity.D = 0.001f;
-	motor.PID_velocity.output_ramp = 1000;
-	motor.LPF_velocity.Tf = 0.01f;
-	motor.voltage_limit = 8;
-	//motor.P_angle.P = 20;
-	motor.init();
-	motor.initFOC();
+  sensor.init();
+  motor.linkSensor(&sensor);
+  driver.voltage_power_supply = 9;
+  driver.init();
+  motor.linkDriver(&driver);
+  motor.controller = MotionControlType::velocity;
+  motor.PID_velocity.P = 0.2f;
+  motor.PID_velocity.I = 20;
+  motor.PID_velocity.D = 0.001f;
+  motor.PID_velocity.output_ramp = 1000;
+  motor.LPF_velocity.Tf = 0.01f;
+  motor.voltage_limit = 8;
+  //motor.P_angle.P = 20;
+  motor.init();
+  motor.initFOC();
 
-	Serial.println("All initialization complete.");
+  Serial.println("All initialization complete.");
 }
 
 // velocity set point variable
@@ -113,22 +113,22 @@ float target_angle = 1.0f;
 
 
 void motorControl(OSCMessage &msg){
-	if (msg.isInt(0))
-		target_velocity = radians(msg.getInt(0));
-	else if (msg.isFloat(0))
-		target_velocity = radians(msg.getFloat(0));
-	else if (msg.isDouble(0))
-		target_velocity = radians(msg.getDouble(0));
-	Serial.print("Velocity set to ");
-	Serial.println(target_velocity);
+  if (msg.isInt(0))
+    target_velocity = radians(msg.getInt(0));
+  else if (msg.isFloat(0))
+    target_velocity = radians(msg.getFloat(0));
+  else if (msg.isDouble(0))
+    target_velocity = radians(msg.getDouble(0));
+  Serial.print("Velocity set to ");
+  Serial.println(target_velocity);
 }
 
 void cmdControl(OSCMessage &msg){
-	char cmdStr[16];
-	if (msg.isString(0)) {
-		msg.getString(0,cmdStr,16);
-		command.motor(&motor,cmdStr);
-	}
+  char cmdStr[16];
+  if (msg.isString(0)) {
+    msg.getString(0,cmdStr,16);
+    command.motor(&motor,cmdStr);
+  }
 }
 
 long lastSend = 0;
@@ -137,47 +137,47 @@ OSCMessage bundleIN;
 void loop() {
     OSCBundle bundleOUT;
 
-	// FOC algorithm function
-	motor.move(target_velocity);
-	motor.loopFOC();
+  // FOC algorithm function
+  motor.move(target_velocity);
+  motor.loopFOC();
 
 
-	int size = Udp.parsePacket();
-	if (size > 0) {
-	    while (size--) {
-	    	bundleIN.fill(Udp.read());
-	    }
-	    if (!bundleIN.hasError()) {
-			bundleIN.dispatch("/mot1/S", motorControl);
-			bundleIN.dispatch("/mot1/C", cmdControl);
-	        IPAddress ip = Udp.remoteIP();
-	        if (!( ip==outIp )) {
-	        	Serial.print("New connection from ");
-	        	Serial.println(ip);
-	        	outIp = ip;
-	        }
-		}
-	    else {
-	    	error = bundleIN.getError();
-	    	Serial.print("error: ");
-	    	Serial.println(error);
-	    }
-		bundleIN.empty();
-	}
-	else { // don't receive and send in the same loop...
-		long now = millis();
-		if (now - lastSend > 100) {
-			int ang = (int)degrees(motor.shaftAngle()) % 360;
-			if (ang<0) ang = 360-abs(ang);
-		    //BOSCBundle's add' returns the OSCMessage so the message's 'add' can be composed together
-			bundleOUT.add("/mot1/A").add((int)ang);
-			bundleOUT.add("/mot1/V").add((int)degrees(motor.shaftVelocity()));
-			Udp.beginPacket(outIp, outPort);
-		    bundleOUT.send(Udp);
-		    Udp.endPacket();
-		    bundleOUT.empty(); // empty the bundle to free room for a new one
-		    lastSend = now;
-		}
-	}
+  int size = Udp.parsePacket();
+  if (size > 0) {
+      while (size--) {
+        bundleIN.fill(Udp.read());
+      }
+      if (!bundleIN.hasError()) {
+      bundleIN.dispatch("/mot1/S", motorControl);
+      bundleIN.dispatch("/mot1/C", cmdControl);
+          IPAddress ip = Udp.remoteIP();
+          if (!( ip==outIp )) {
+            Serial.print("New connection from ");
+            Serial.println(ip);
+            outIp = ip;
+          }
+    }
+      else {
+        error = bundleIN.getError();
+        Serial.print("error: ");
+        Serial.println(error);
+      }
+    bundleIN.empty();
+  }
+  else { // don't receive and send in the same loop...
+    long now = millis();
+    if (now - lastSend > 100) {
+      int ang = (int)degrees(motor.shaftAngle()) % 360;
+      if (ang<0) ang = 360-abs(ang);
+        //BOSCBundle's add' returns the OSCMessage so the message's 'add' can be composed together
+      bundleOUT.add("/mot1/A").add((int)ang);
+      bundleOUT.add("/mot1/V").add((int)degrees(motor.shaftVelocity()));
+      Udp.beginPacket(outIp, outPort);
+        bundleOUT.send(Udp);
+        Udp.endPacket();
+        bundleOUT.empty(); // empty the bundle to free room for a new one
+        lastSend = now;
+    }
+  }
 
 }

@@ -1,6 +1,6 @@
 #include "StepperDriver2PWM.h"
 
-StepperDriver2PWM::StepperDriver2PWM(int _pwm1, int* _in1, int _pwm2, int* _in2, int en1, int en2){
+StepperDriver2PWM::StepperDriver2PWM(int _pwm1, int* _in1, int _pwm2, int* _in2, int en1, int en2) {
   // Pin initialization
   pwm1 = _pwm1; // phase 1 pwm pin number
   dir1a = _in1[0]; // phase 1 INA pin number
@@ -20,7 +20,7 @@ StepperDriver2PWM::StepperDriver2PWM(int _pwm1, int* _in1, int _pwm2, int* _in2,
 
 }
 
-StepperDriver2PWM::StepperDriver2PWM(int _pwm1, int _dir1, int _pwm2, int _dir2, int en1, int en2){
+StepperDriver2PWM::StepperDriver2PWM(int _pwm1, int _dir1, int _pwm2, int _dir2, int en1, int en2) {
   // Pin initialization
   pwm1 = _pwm1; // phase 1 pwm pin number
   dir1a = _dir1; // phase 1 direction pin
@@ -42,22 +42,21 @@ StepperDriver2PWM::StepperDriver2PWM(int _pwm1, int _dir1, int _pwm2, int _dir2,
 }
 
 // enable motor driver
-void  StepperDriver2PWM::enable(){
+void  StepperDriver2PWM::enable() {
     // enable_pin the driver - if enable_pin pin available
-    if ( _isset(enable_pin1) ) digitalWrite(enable_pin1, HIGH);
-    if ( _isset(enable_pin2) ) digitalWrite(enable_pin2, HIGH);
+    if ( _isset(enable_pin1) ) { digitalWrite(enable_pin1, HIGH); }
+    if ( _isset(enable_pin2) ) { digitalWrite(enable_pin2, HIGH); }
     // set zero to PWM
     setPwm(0,0);
 }
 
 // disable motor driver
-void StepperDriver2PWM::disable()
-{
+void StepperDriver2PWM::disable() {
   // set zero to PWM
   setPwm(0, 0);
   // disable the driver - if enable_pin pin available
-  if ( _isset(enable_pin1) ) digitalWrite(enable_pin1, LOW);
-  if ( _isset(enable_pin2) ) digitalWrite(enable_pin2, LOW);
+  if ( _isset(enable_pin1) ) { digitalWrite(enable_pin1, LOW); }
+  if ( _isset(enable_pin2) ) { digitalWrite(enable_pin2, LOW); }
 
 }
 
@@ -68,20 +67,20 @@ int StepperDriver2PWM::init() {
   pinMode(pwm2, OUTPUT);
   pinMode(dir1a, OUTPUT);
   pinMode(dir2a, OUTPUT);
-  if( _isset(dir1b) ) pinMode(dir1b, OUTPUT);
-  if( _isset(dir2b) ) pinMode(dir2b, OUTPUT);
+  if( _isset(dir1b) ) { pinMode(dir1b, OUTPUT); }
+  if( _isset(dir2b) ) { pinMode(dir2b, OUTPUT); }
 
-  if( _isset(enable_pin1) ) pinMode(enable_pin1, OUTPUT);
-  if( _isset(enable_pin2) ) pinMode(enable_pin2, OUTPUT);
+  if( _isset(enable_pin1) ) { pinMode(enable_pin1, OUTPUT); }
+  if( _isset(enable_pin2) ) { pinMode(enable_pin2, OUTPUT); }
 
   // sanity check for the voltage limit configuration
-  if( !_isset(voltage_limit)  || voltage_limit > voltage_power_supply) voltage_limit =  voltage_power_supply;
+  if( (!_isset(voltage_limit))  || (voltage_limit > voltage_power_supply)) { voltage_limit =  voltage_power_supply; } // TLD order of operations check
 
   // Set the pwm frequency to the pins
   // hardware specific function - depending on driver and mcu
   params = _configure2PWM(pwm_frequency, pwm1, pwm2);
   initialized = (params!=SIMPLEFOC_DRIVER_INIT_FAILED);
-  return params!=SIMPLEFOC_DRIVER_INIT_FAILED;
+  return(params!=SIMPLEFOC_DRIVER_INIT_FAILED);
 }
 
 
@@ -92,15 +91,15 @@ void StepperDriver2PWM::setPwm(float Ua, float Ub) {
   Ua = _constrain(Ua, -voltage_limit, voltage_limit);
   Ub = _constrain(Ub, -voltage_limit, voltage_limit);
   // hardware specific writing
-  duty_cycle1 = _constrain(abs(Ua)/voltage_power_supply,0.0f,1.0f);
-  duty_cycle2 = _constrain(abs(Ub)/voltage_power_supply,0.0f,1.0f);
+  duty_cycle1 = _constrain(fabs(Ua)/voltage_power_supply,0.0f,1.0f); // TLD changed abs() to fabs()
+  duty_cycle2 = _constrain(fabs(Ub)/voltage_power_supply,0.0f,1.0f); // TLD changed abs() to fabs()
 
   // phase 1 direction
   digitalWrite(dir1a, Ua >= 0 ? LOW : HIGH);
-  if( _isset(dir1b) ) digitalWrite(dir1b, Ua >= 0 ? HIGH : LOW );
+  if( _isset(dir1b) ) { digitalWrite(dir1b, Ua >= 0 ? HIGH : LOW ); }
   // phase 2 direction
   digitalWrite(dir2a, Ub >= 0 ? LOW : HIGH);
-  if( _isset(dir2b) ) digitalWrite(dir2b, Ub >= 0 ? HIGH : LOW );
+  if( _isset(dir2b) ) { digitalWrite(dir2b, Ub >= 0 ? HIGH : LOW ); }
 
   // write to hardware
   _writeDutyCycle2PWM(duty_cycle1, duty_cycle2, params);

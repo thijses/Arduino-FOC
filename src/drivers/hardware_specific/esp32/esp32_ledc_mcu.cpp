@@ -50,7 +50,7 @@ typedef struct ESP32LEDCDriverParams {
 
 
 //  configure High PWM frequency
-void _setHighFrequency(const long freq, const int pin, const int channel){
+void _setHighFrequency(const long freq, const int pin, const int channel) {
   ledcSetup(channel, freq, _PWM_RES_BIT );
   ledcAttachPin(pin, channel);
 }
@@ -61,11 +61,11 @@ void _setHighFrequency(const long freq, const int pin, const int channel){
 
 
 void* _configure1PWM(long pwm_frequency, const int pinA) {
-  if(!pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 25khz
-  else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to 50kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency)) ) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 25khz
+  else { pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); } // constrain to 50kHz max
 
   // check if enough channels available
-  if ( channel_index + 1 >= LEDC_CHANNELS ) return SIMPLEFOC_DRIVER_INIT_FAILED;
+  if ( (channel_index + 1) >= LEDC_CHANNELS ) { return SIMPLEFOC_DRIVER_INIT_FAILED; } // TLD order of operations check
 
   int ch1 = channel_index++;
   _setHighFrequency(pwm_frequency, pinA, ch1);
@@ -74,7 +74,7 @@ void* _configure1PWM(long pwm_frequency, const int pinA) {
     .channels = { ch1 },
     .pwm_frequency = pwm_frequency
   };
-  return params;
+  return(params);
 }
 
 
@@ -85,11 +85,11 @@ void* _configure1PWM(long pwm_frequency, const int pinA) {
 
 
 void* _configure2PWM(long pwm_frequency, const int pinA, const int pinB) {
-  if(!pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 25khz
-  else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to 50kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency)) ) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 25khz
+  else { pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); } // constrain to 50kHz max
 
   // check if enough channels available
-  if ( channel_index + 2 >= LEDC_CHANNELS ) return SIMPLEFOC_DRIVER_INIT_FAILED;
+  if ( (channel_index + 2) >= LEDC_CHANNELS ) { return SIMPLEFOC_DRIVER_INIT_FAILED; } // TLD order of operations check
 
   int ch1 = channel_index++;
   int ch2 = channel_index++;
@@ -100,17 +100,17 @@ void* _configure2PWM(long pwm_frequency, const int pinA, const int pinB) {
     .channels = { ch1, ch2 },
     .pwm_frequency = pwm_frequency
   };
-  return params;
+  return(params);
 }
 
 
 
 void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const int pinC) {
-  if(!pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 25khz
-  else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to 50kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency)) ) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 25khz
+  else { pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); } // constrain to 50kHz max
 
   // check if enough channels available
-  if ( channel_index + 3 >= LEDC_CHANNELS ) return SIMPLEFOC_DRIVER_INIT_FAILED;
+  if ( (channel_index + 3) >= LEDC_CHANNELS ) { return SIMPLEFOC_DRIVER_INIT_FAILED; } // TLD order of operations check
 
   int ch1 = channel_index++;
   int ch2 = channel_index++;
@@ -123,17 +123,17 @@ void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const in
     .channels = { ch1, ch2, ch3 },
     .pwm_frequency = pwm_frequency
   };
-  return params;
+  return(params);
 }
 
 
 
 void* _configure4PWM(long pwm_frequency,const int pinA, const int pinB, const int pinC, const int pinD) {
-  if(!pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 25khz
-  else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to 50kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency)) ) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 25khz
+  else { pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); } // constrain to 50kHz max
 
   // check if enough channels available
-  if ( channel_index + 4 >= LEDC_CHANNELS ) return SIMPLEFOC_DRIVER_INIT_FAILED;
+  if ( (channel_index + 4) >= LEDC_CHANNELS ) { return SIMPLEFOC_DRIVER_INIT_FAILED; } // TLD order of operations check
 
   int ch1 = channel_index++;
   int ch2 = channel_index++;
@@ -148,26 +148,26 @@ void* _configure4PWM(long pwm_frequency,const int pinA, const int pinB, const in
     .channels = { ch1, ch2, ch3, ch4 },
     .pwm_frequency = pwm_frequency
   };
-  return params;
+  return(params);
 }
 
 
 
 
-void _writeDutyCycle1PWM(float dc_a, void* params){
+void _writeDutyCycle1PWM(float dc_a, void* params) {
   ledcWrite(((ESP32LEDCDriverParams*)params)->channels[0], _constrain(_PWM_RES*dc_a, 0, _PWM_RES));
 }
 
 
 
-void _writeDutyCycle2PWM(float dc_a,  float dc_b, void* params){
+void _writeDutyCycle2PWM(float dc_a,  float dc_b, void* params) {
   ledcWrite(((ESP32LEDCDriverParams*)params)->channels[0], _constrain(_PWM_RES*dc_a, 0, _PWM_RES));
   ledcWrite(((ESP32LEDCDriverParams*)params)->channels[1], _constrain(_PWM_RES*dc_b, 0, _PWM_RES));
 }
 
 
 
-void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params){
+void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params) {
   ledcWrite(((ESP32LEDCDriverParams*)params)->channels[0], _constrain(_PWM_RES*dc_a, 0, _PWM_RES));
   ledcWrite(((ESP32LEDCDriverParams*)params)->channels[1], _constrain(_PWM_RES*dc_b, 0, _PWM_RES));
   ledcWrite(((ESP32LEDCDriverParams*)params)->channels[2], _constrain(_PWM_RES*dc_c, 0, _PWM_RES));
@@ -175,7 +175,7 @@ void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params){
 
 
 
-void _writeDutyCycle4PWM(float dc_1a,  float dc_1b, float dc_2a, float dc_2b, void* params){
+void _writeDutyCycle4PWM(float dc_1a,  float dc_1b, float dc_2a, float dc_2b, void* params) {
   ledcWrite(((ESP32LEDCDriverParams*)params)->channels[0], _constrain(_PWM_RES*dc_1a, 0, _PWM_RES));
   ledcWrite(((ESP32LEDCDriverParams*)params)->channels[1], _constrain(_PWM_RES*dc_1b, 0, _PWM_RES));
   ledcWrite(((ESP32LEDCDriverParams*)params)->channels[2], _constrain(_PWM_RES*dc_2a, 0, _PWM_RES));

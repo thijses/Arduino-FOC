@@ -33,7 +33,7 @@
 // arbitrary maximum. On SAMD51 with 120MHz clock this means 2kHz minimum pwm frequency
 #define SIMPLEFOC_SAMD_MAX_PWM_RESOLUTION 30000
 // lets not go too low - 400 with clock speed of 120MHz on SAMD51 means 150kHz maximum PWM frequency...
-//						 400 with 48MHz clock on SAMD21 means 60kHz maximum PWM frequency...
+//             400 with 48MHz clock on SAMD21 means 60kHz maximum PWM frequency...
 #define SIMPLEFOC_SAMD_MIN_PWM_RESOLUTION 400 
 // this is the most we can support on the TC units
 #define SIMPLEFOC_SAMD_PWM_TC_RESOLUTION 250
@@ -45,17 +45,17 @@
 
 
 struct tccConfiguration {
-	uint8_t pin;
-	EPioType peripheral; // 1=true, 0=false
-	uint8_t wo;
-	union tccChanInfo {
-		struct {
-			int8_t chan;
-			int8_t tccn;
-		};
-		uint16_t chaninfo;
-	} tcc;
-	uint16_t pwm_res;
+  uint8_t pin;
+  EPioType peripheral; // 1=true, 0=false
+  uint8_t wo;
+  union tccChanInfo {
+    struct {
+      int8_t chan;
+      int8_t tccn;
+    };
+    uint16_t chaninfo;
+  } tcc;
+  uint16_t pwm_res;
 };
 
 
@@ -64,33 +64,33 @@ struct tccConfiguration {
 
 
 struct wo_association {
-	EPortType port;
-	uint32_t pin;
-	ETCChannel tccE;
-	uint8_t woE;
-	ETCChannel tccF;
-	uint8_t woF;
-#if defined(_SAMD51_)||defined(_SAME51_)
-	ETCChannel tccG;
-	uint8_t woG;
-#endif
+  EPortType port;
+  uint32_t pin;
+  ETCChannel tccE;
+  uint8_t woE;
+  ETCChannel tccF;
+  uint8_t woF;
+  #if defined(_SAMD51_)||defined(_SAME51_)
+    ETCChannel tccG;
+    uint8_t woG;
+  #endif
 };
 
 
 
 typedef struct SAMDHardwareDriverParams {
-	tccConfiguration* tccPinConfigurations[6];
-	uint32_t pwm_frequency;
-	float dead_zone;
+  tccConfiguration* tccPinConfigurations[6];
+  uint32_t pwm_frequency;
+  float dead_zone;
 } SAMDHardwareDriverParams;
 
 
 
 
 #if defined(_SAMD21_)
-#define NUM_PIO_TIMER_PERIPHERALS 2
+  #define NUM_PIO_TIMER_PERIPHERALS 2
 #elif defined(_SAMD51_)||defined(_SAME51_)
-#define NUM_PIO_TIMER_PERIPHERALS 3
+  #define NUM_PIO_TIMER_PERIPHERALS 3
 #endif
 
 
@@ -115,8 +115,8 @@ __inline__ void syncTCC(Tcc* TCCx) __attribute__((always_inline, unused));
 EPioType getPeripheralOfPermutation(int permutation, int pin_position);
 
 #ifdef SIMPLEFOC_SAMD_DEBUG
-void printTCCConfiguration(tccConfiguration& info);
-void printAllPinInfos();
+  void printTCCConfiguration(tccConfiguration& info);
+  void printAllPinInfos();
 #endif
 
 

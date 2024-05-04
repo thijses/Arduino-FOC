@@ -11,27 +11,27 @@
 #define _PWM_FREQUENCY_MIN 4000
 
 // set pwm frequency to 32KHz
-void _pinHighFrequency(const int pin, const long frequency){
+void _pinHighFrequency(const int pin, const long frequency) {
   bool high_fq = false;
   // set 32kHz frequency if requested freq is higher than the middle of the range (14kHz)
   // else set the 4kHz
-  if(frequency >= 0.5*(_PWM_FREQUENCY_MAX-_PWM_FREQUENCY_MIN))  high_fq=true; 
+  if(frequency >= (0.5*(_PWM_FREQUENCY_MAX-_PWM_FREQUENCY_MIN)))  { high_fq=true; } // TLD order of operations check
   //  High PWM frequency
   //  https://www.arxterra.com/9-atmega328p-timers/
-  if (pin == 5 || pin == 6  ) {
-      TCCR0A = ((TCCR0A & 0b11111100) | 0x01); // configure the pwm phase-corrected mode
-      if(high_fq) TCCR0B = ((TCCR0B & 0b11110000) | 0x01); // set prescaler to 1 - 32kHz
-      else TCCR0B = ((TCCR0B & 0b11110000) | 0x02); // set prescaler to 2 - 4kHz
-  }else if (pin == 9 || pin == 10 ){
-      if(high_fq) TCCR1B = ((TCCR1B & 0b11110000) | 0x01); // set prescaler to 1 - 32kHz
-      else TCCR1B = ((TCCR1B & 0b11110000) | 0x02); // set prescaler to 2 - 4kHz
-  }else if (pin == 3 || pin == 11){
-      if(high_fq) TCCR2B = ((TCCR2B & 0b11110000) | 0x01); // set prescaler to 1 - 32kHz
-      else TCCR2B = ((TCCR2B & 0b11110000) | 0x02); // set prescaler to 2 - 4kHz
+  if((pin == 5) || (pin == 6)  ) { // TLD order of operations check
+    TCCR0A = ((TCCR0A & 0b11111100) | 0x01); // configure the pwm phase-corrected mode
+    if(high_fq) { TCCR0B = ((TCCR0B & 0b11110000) | 0x01); } // set prescaler to 1 - 32kHz
+    else { TCCR0B = ((TCCR0B & 0b11110000) | 0x02); } // set prescaler to 2 - 4kHz
+  } else if((pin == 9) || (pin == 10) ) { // TLD order of operations check
+    if(high_fq) { TCCR1B = ((TCCR1B & 0b11110000) | 0x01); } // set prescaler to 1 - 32kHz
+    else { TCCR1B = ((TCCR1B & 0b11110000) | 0x02); } // set prescaler to 2 - 4kHz
+  } else if((pin == 3) || (pin == 11)) { // TLD order of operations check
+    if(high_fq) { TCCR2B = ((TCCR2B & 0b11110000) | 0x01); } // set prescaler to 1 - 32kHz
+    else { TCCR2B = ((TCCR2B & 0b11110000) | 0x02); } // set prescaler to 2 - 4kHz
   }
 }
 
-void _syncAllTimers(){
+void _syncAllTimers() {
   GTCCR = (1<<TSM)|(1<<PSRASY)|(1<<PSRSYNC); // halt all timers 
   // set all timers to the same value
   TCNT0 = 0; // set timer0 to 0
@@ -46,8 +46,8 @@ void _syncAllTimers(){
 // - hardware specific
 // supports Arduino/ATmega328
 void* _configure1PWM(long pwm_frequency,const int pinA) {
-  if(!pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 32kHz
-  else pwm_frequency = _constrain(pwm_frequency, _PWM_FREQUENCY_MIN, _PWM_FREQUENCY_MAX); // constrain to 4-32kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency)) ) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 32kHz // TLD order of operations check
+  else { pwm_frequency = _constrain(pwm_frequency, _PWM_FREQUENCY_MIN, _PWM_FREQUENCY_MAX); } // constrain to 4-32kHz max
    //  High PWM frequency
    // - always max 32kHz
   _pinHighFrequency(pinA, pwm_frequency);
@@ -56,15 +56,15 @@ void* _configure1PWM(long pwm_frequency,const int pinA) {
     .pwm_frequency = pwm_frequency,
     .dead_zone = 0.0f
   };
-  return params;
+  return(params);
 }
 // function setting the high pwm frequency to the supplied pins
 // - Stepper motor - 2PWM setting
 // - hardware specific
 // supports Arduino/ATmega328
 void* _configure2PWM(long pwm_frequency,const int pinA, const int pinB) { 
-  if(!pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 32kHz
-  else pwm_frequency = _constrain(pwm_frequency, _PWM_FREQUENCY_MIN, _PWM_FREQUENCY_MAX); // constrain to 4-32kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency)) ) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 32kHz // TLD order of operations check
+  else { pwm_frequency = _constrain(pwm_frequency, _PWM_FREQUENCY_MIN, _PWM_FREQUENCY_MAX); } // constrain to 4-32kHz max
    //  High PWM frequency
    // - always max 32kHz
   _pinHighFrequency(pinA, pwm_frequency);
@@ -74,7 +74,7 @@ void* _configure2PWM(long pwm_frequency,const int pinA, const int pinB) {
     .pwm_frequency = pwm_frequency,
     .dead_zone = 0.0f
   };
-  return params;
+  return(params);
 }
 
 // function setting the high pwm frequency to the supplied pins
@@ -82,8 +82,8 @@ void* _configure2PWM(long pwm_frequency,const int pinA, const int pinB) {
 // - hardware specific
 // supports Arduino/ATmega328
 void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const int pinC) {
-  if(!pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 32kHz
-  else pwm_frequency = _constrain(pwm_frequency, _PWM_FREQUENCY_MIN, _PWM_FREQUENCY_MAX); // constrain to 4-32kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency)) ) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 32kHz // TLD order of operations check
+  else { pwm_frequency = _constrain(pwm_frequency, _PWM_FREQUENCY_MIN, _PWM_FREQUENCY_MAX); } // constrain to 4-32kHz max
    //  High PWM frequency
    // - always max 32kHz
   _pinHighFrequency(pinA, pwm_frequency);
@@ -95,7 +95,7 @@ void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const in
     .dead_zone = 0.0f
   };
   _syncAllTimers();
-  return params;
+  return(params);
 }
 
 
@@ -104,7 +104,7 @@ void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const in
 // function setting the pwm duty cycle to the hardware
 // - Stepper motor - 2PWM setting
 // - hardware specific
-void _writeDutyCycle1PWM(float dc_a, void* params){
+void _writeDutyCycle1PWM(float dc_a, void* params) {
   // transform duty cycle from [0,1] to [0,255]
   analogWrite(((GenericDriverParams*)params)->pins[0], 255.0f*dc_a);
 }
@@ -113,7 +113,7 @@ void _writeDutyCycle1PWM(float dc_a, void* params){
 // function setting the pwm duty cycle to the hardware
 // - Stepper motor - 2PWM setting
 // - hardware specific
-void _writeDutyCycle2PWM(float dc_a,  float dc_b, void* params){
+void _writeDutyCycle2PWM(float dc_a,  float dc_b, void* params) {
   // transform duty cycle from [0,1] to [0,255]
   analogWrite(((GenericDriverParams*)params)->pins[0], 255.0f*dc_a);
   analogWrite(((GenericDriverParams*)params)->pins[1], 255.0f*dc_b);
@@ -122,7 +122,7 @@ void _writeDutyCycle2PWM(float dc_a,  float dc_b, void* params){
 // function setting the pwm duty cycle to the hardware
 // - BLDC motor - 3PWM setting
 // - hardware specific
-void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params){
+void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params) {
   // transform duty cycle from [0,1] to [0,255]
   analogWrite(((GenericDriverParams*)params)->pins[0], 255.0f*dc_a);
   analogWrite(((GenericDriverParams*)params)->pins[1], 255.0f*dc_b);
@@ -134,8 +134,8 @@ void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params){
 // - hardware specific
 // supports Arduino/ATmega328
 void* _configure4PWM(long pwm_frequency,const int pin1A, const int pin1B, const int pin2A, const int pin2B) {
-  if(!pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 32kHz
-  else pwm_frequency = _constrain(pwm_frequency, _PWM_FREQUENCY_MIN, _PWM_FREQUENCY_MAX); // constrain to 4-32kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency)) ) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 32kHz // TLD order of operations check
+  else { pwm_frequency = _constrain(pwm_frequency, _PWM_FREQUENCY_MIN, _PWM_FREQUENCY_MAX); } // constrain to 4-32kHz max
    //  High PWM frequency
    // - always max 32kHz
   _pinHighFrequency(pin1A,pwm_frequency);
@@ -147,13 +147,13 @@ void* _configure4PWM(long pwm_frequency,const int pin1A, const int pin1B, const 
     .pwm_frequency = pwm_frequency,
     .dead_zone = 0.0f
   };
-  return params;
+  return(params);
 }
 
 // function setting the pwm duty cycle to the hardware
 // - Stepper motor - 4PWM setting
 // - hardware specific
-void _writeDutyCycle4PWM(float dc_1a,  float dc_1b, float dc_2a, float dc_2b, void* params){
+void _writeDutyCycle4PWM(float dc_1a,  float dc_1b, float dc_2a, float dc_2b, void* params) {
   // transform duty cycle from [0,1] to [0,255]
   analogWrite(((GenericDriverParams*)params)->pins[0], 255.0f*dc_1a);
   analogWrite(((GenericDriverParams*)params)->pins[1], 255.0f*dc_1b);
@@ -167,36 +167,36 @@ int _configureComplementaryPair(const int pinH, const int pinL, long frequency) 
   bool high_fq = false;
   // set 32kHz frequency if requested freq is higher than the middle of the range (14kHz)
   // else set the 4kHz
-  if(frequency >= 0.5*(_PWM_FREQUENCY_MAX-_PWM_FREQUENCY_MIN))  high_fq=true; 
+  if(frequency >= (0.5*(_PWM_FREQUENCY_MAX-_PWM_FREQUENCY_MIN))) { high_fq=true; } // TLD order of operations check
 
   // configure pins
-  if( (pinH == 5 && pinL == 6 ) || (pinH == 6 && pinL == 5 ) ){
+  if( ((pinH == 5) && (pinL == 6) ) || ((pinH == 6) && (pinL == 5) ) ) { // TLD order of operations check
     // configure the pwm phase-corrected mode
     TCCR0A = ((TCCR0A & 0b11111100) | 0x01);
     // configure complementary pwm on low side
-    if(pinH == 6 ) TCCR0A = 0b10110000 | (TCCR0A & 0b00001111) ;
-    else TCCR0A = 0b11100000 | (TCCR0A & 0b00001111) ;
+    if(pinH == 6 ) { TCCR0A = 0b10110000 | (TCCR0A & 0b00001111); }
+    else { TCCR0A = 0b11100000 | (TCCR0A & 0b00001111); }
     // set frequency
-    if(high_fq) TCCR0B = ((TCCR0B & 0b11110000) | 0x01); // set prescaler to 1 - 32kHz
-    else TCCR0B = ((TCCR0B & 0b11110000) | 0x02); // set prescaler to 2 - 4kHz
-  }else if( (pinH == 9 && pinL == 10 ) || (pinH == 10 && pinL == 9 ) ){
+    if(high_fq) { TCCR0B = ((TCCR0B & 0b11110000) | 0x01); } // set prescaler to 1 - 32kHz
+    else { TCCR0B = ((TCCR0B & 0b11110000) | 0x02); } // set prescaler to 2 - 4kHz
+  } else if( ((pinH == 9) && (pinL == 10) ) || ((pinH == 10) && (pinL == 9) ) ) { // TLD order of operations check
     // set frequency
-    if(high_fq) TCCR1B = ((TCCR1B & 0b11110000) | 0x01); // set prescaler to 1 - 32kHz
-    else TCCR1B = ((TCCR1B & 0b11110000) | 0x02); // set prescaler to 2 - 4kHz
+    if(high_fq) { TCCR1B = ((TCCR1B & 0b11110000) | 0x01); } // set prescaler to 1 - 32kHz
+    else { TCCR1B = ((TCCR1B & 0b11110000) | 0x02); } // set prescaler to 2 - 4kHz
     // configure complementary pwm on low side
-    if(pinH == 9 ) TCCR1A = 0b10110000 | (TCCR1A & 0b00001111) ;
-    else TCCR1A = 0b11100000 | (TCCR1A & 0b00001111) ;
-  }else if((pinH == 3 && pinL == 11 ) || (pinH == 11 && pinL == 3 ) ){
+    if(pinH == 9 ) { TCCR1A = 0b10110000 | (TCCR1A & 0b00001111); }
+    else { TCCR1A = 0b11100000 | (TCCR1A & 0b00001111); }
+  } else if(((pinH == 3) && (pinL == 11) ) || ((pinH == 11) && (pinL == 3) ) ) { // TLD order of operations check
     // set frequency
-    if(high_fq) TCCR2B = ((TCCR2B & 0b11110000) | 0x01); // set prescaler to 1 - 32kHz
-    else TCCR2B = ((TCCR2B & 0b11110000) | 0x02); // set prescaler to 2 - 4kHz
+    if(high_fq) { TCCR2B = ((TCCR2B & 0b11110000) | 0x01); } // set prescaler to 1 - 32kHz
+    else { TCCR2B = ((TCCR2B & 0b11110000) | 0x02); } // set prescaler to 2 - 4kHz
     // configure complementary pwm on low side
-    if(pinH == 11 ) TCCR2A = 0b10110000 | (TCCR2A & 0b00001111) ;
-    else TCCR2A = 0b11100000 | (TCCR2A & 0b00001111) ;
-  }else{
-    return -1;
+    if(pinH == 11 ) { TCCR2A = 0b10110000 | (TCCR2A & 0b00001111); }
+    else { TCCR2A = 0b11100000 | (TCCR2A & 0b00001111); }
+  } else {
+    return(-1);
   }
-  return 0;
+  return(0);
 }
 
 // Configuring PWM frequency, resolution and alignment
@@ -204,22 +204,22 @@ int _configureComplementaryPair(const int pinH, const int pinL, long frequency) 
 // - hardware specific
 // supports Arduino/ATmega328
 void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, const int pinA_l,  const int pinB_h, const int pinB_l, const int pinC_h, const int pinC_l) {
-  if(!pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 32kHz
-  else pwm_frequency = _constrain(pwm_frequency, _PWM_FREQUENCY_MIN, _PWM_FREQUENCY_MAX); // constrain to 4-32kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency)) ) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 32kHz // TLD order of operations check
+  else { pwm_frequency = _constrain(pwm_frequency, _PWM_FREQUENCY_MIN, _PWM_FREQUENCY_MAX); } // constrain to 4-32kHz max
   //  High PWM frequency
   // - always max 32kHz
   int ret_flag = 0;
   ret_flag += _configureComplementaryPair(pinA_h, pinA_l, pwm_frequency);
   ret_flag += _configureComplementaryPair(pinB_h, pinB_l, pwm_frequency);
   ret_flag += _configureComplementaryPair(pinC_h, pinC_l, pwm_frequency);
-  if (ret_flag!=0) return SIMPLEFOC_DRIVER_INIT_FAILED;
+  if(ret_flag!=0) { return(SIMPLEFOC_DRIVER_INIT_FAILED); }
   GenericDriverParams* params = new GenericDriverParams {
     .pins = { pinA_h, pinA_l, pinB_h, pinB_l, pinC_h, pinC_l },
     .pwm_frequency = pwm_frequency,
     .dead_zone = dead_zone
   };
   _syncAllTimers();
-  return params;
+  return(params);
 }
 
 // function setting the
@@ -229,18 +229,19 @@ void _setPwmPair(int pinH, int pinL, float val, int dead_time, PhaseState ps)
   int pwm_l = _constrain(val+dead_time/2,0,255);
   // determine the phase state and set the pwm accordingly
   // deactivate phases if needed
-  if((ps == PhaseState::PHASE_OFF) || (ps == PhaseState::PHASE_LO)){
+  if((ps == PhaseState::PHASE_OFF) || (ps == PhaseState::PHASE_LO)) {
     digitalWrite(pinH, LOW);
-  }else{
+  } else {
     analogWrite(pinH, pwm_h);
   }
-  if((ps == PhaseState::PHASE_OFF) || (ps == PhaseState::PHASE_HI)){
+  if((ps == PhaseState::PHASE_OFF) || (ps == PhaseState::PHASE_HI)) {
     digitalWrite(pinL, LOW);
-  }else{
-    if(pwm_l == 255 || pwm_l == 0)
+  } else {
+    if(pwm_l == 255 || pwm_l == 0) {
       digitalWrite(pinL, pwm_l ? LOW : HIGH);
-    else
+    } else {
       analogWrite(pinL, pwm_l);
+    }
   }
 
 
@@ -250,7 +251,7 @@ void _setPwmPair(int pinH, int pinL, float val, int dead_time, PhaseState ps)
 //  - BLDC driver - 6PWM setting
 //  - hardware specific
 // supports Arduino/ATmega328
-void _writeDutyCycle6PWM(float dc_a,  float dc_b, float dc_c, PhaseState *phase_state, void* params){
+void _writeDutyCycle6PWM(float dc_a,  float dc_b, float dc_c, PhaseState *phase_state, void* params) {
   _setPwmPair(((GenericDriverParams*)params)->pins[0], ((GenericDriverParams*)params)->pins[1], dc_a*255.0, ((GenericDriverParams*)params)->dead_zone*255.0, phase_state[0]);
   _setPwmPair(((GenericDriverParams*)params)->pins[2], ((GenericDriverParams*)params)->pins[3], dc_b*255.0, ((GenericDriverParams*)params)->dead_zone*255.0, phase_state[1]);
   _setPwmPair(((GenericDriverParams*)params)->pins[4], ((GenericDriverParams*)params)->pins[5], dc_c*255.0, ((GenericDriverParams*)params)->dead_zone*255.0, phase_state[2]);

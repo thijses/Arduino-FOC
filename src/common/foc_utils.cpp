@@ -4,7 +4,7 @@
 // function approximating the sine calculation by using fixed size array
 // uses a 65 element lookup table and interpolation
 // thanks to @dekutree for his work on optimizing this
-__attribute__((weak)) float _sin(float a){
+__attribute__((weak)) float _sin(float a) {
   // 16bit integer array for sine lookup. interpolation is used for better precision
   // 16 bit precision on sine value, 8 bit fractional value for interpolation, 6bit LUT size
   // resulting precision compared to stdlib sine is 0.00006480 (RMS difference in range -PI,PI for 3217 steps)
@@ -12,19 +12,16 @@ __attribute__((weak)) float _sin(float a){
   unsigned int i = (unsigned int)(a * (64*4*256.0f/_2PI));
   int t1, t2, frac = i & 0xff;
   i = (i >> 8) & 0xff;
-  if (i < 64) {
+  if(i < 64) {
     t1 = sine_array[i]; t2 = sine_array[i+1];
-  }
-  else if(i < 128) {
+  } else if(i < 128) {
     t1 = sine_array[128 - i]; t2 = sine_array[127 - i];
-  }
-  else if(i < 192) {
+  } else if(i < 192) {
     t1 = -sine_array[-128 + i]; t2 = -sine_array[-127 + i];
-  }
-  else {
+  } else {
     t1 = -sine_array[256 - i]; t2 = -sine_array[255 - i];
   }
-  return (1.0f/32768.0f) * (t1 + (((t2 - t1) * frac) >> 8));
+  return((1.0f/32768.0f) * (t1 + (((t2 - t1) * frac) >> 8)));
 }
 
 // function approximating cosine calculation by using fixed size array
@@ -32,14 +29,14 @@ __attribute__((weak)) float _sin(float a){
 // ~56us (int array)
 // precision +-0.005
 // it has to receive an angle in between 0 and 2PI
-__attribute__((weak)) float _cos(float a){
+__attribute__((weak)) float _cos(float a) {
   float a_sin = a + _PI_2;
   a_sin = a_sin > _2PI ? a_sin - _2PI : a_sin;
   return _sin(a_sin);
 }
 
 
-__attribute__((weak)) void _sincos(float a, float* s, float* c){
+__attribute__((weak)) void _sincos(float a, float* s, float* c) {
   *s = _sin(a);
   *c = _cos(a);
 }
@@ -62,25 +59,25 @@ __attribute__((weak)) float _atan2(float y, float x) {
     float r =
         ((-0.0464964749f * s + 0.15931422f) * s - 0.327622764f) * s * a + a;
     // if |y| > |x| then r := 1.57079637 - r
-    if (abs_y > abs_x) r = 1.57079637f - r;
+    if (abs_y > abs_x) { r = 1.57079637f - r; }
     // if x < 0 then r := 3.14159274 - r
-    if (x < 0.0f) r = 3.14159274f - r;
+    if (x < 0.0f) { r = 3.14159274f - r; }
     // if y < 0 then r := -r
-    if (y < 0.0f) r = -r;
+    if (y < 0.0f) { r = -r; }
 
-    return r;
+    return(r);
   }
 
 
 // normalizing radian angle to [0,2PI]
-__attribute__((weak)) float _normalizeAngle(float angle){
+__attribute__((weak)) float _normalizeAngle(float angle) {
   float a = fmod(angle, _2PI);
-  return a >= 0 ? a : (a + _2PI);
+  return((a >= 0) ? a : (a + _2PI)); // TLD order of operations check
 }
 
 // Electrical angle calculation
 float _electricalAngle(float shaft_angle, int pole_pairs) {
-  return (shaft_angle * pole_pairs);
+  return(shaft_angle * pole_pairs);
 }
 
 // square root approximation function using
@@ -92,5 +89,5 @@ __attribute__((weak)) float _sqrtApprox(float number) {//low in fat
     uint32_t i;
   } y = { .f = number };
   y.i = 0x5f375a86 - ( y.i >> 1 );
-  return number * y.f;
+  return(number * y.f);
 }

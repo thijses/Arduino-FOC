@@ -54,9 +54,9 @@ class LowsideCurrentSense: public CurrentSense{
   private:
 
     // hardware variables
-  	int pinA; //!< pin A analog pin for current measurement
-  	int pinB; //!< pin B analog pin for current measurement
-  	int pinC; //!< pin C analog pin for current measurement
+    int pinA; //!< pin A analog pin for current measurement
+    int pinB; //!< pin B analog pin for current measurement
+    int pinC; //!< pin C analog pin for current measurement
 
     // gain variables
     float shunt_resistor; //!< Shunt resistor value

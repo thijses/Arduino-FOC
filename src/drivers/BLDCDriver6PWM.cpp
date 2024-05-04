@@ -1,6 +1,6 @@
 #include "BLDCDriver6PWM.h"
 
-BLDCDriver6PWM::BLDCDriver6PWM(int phA_h,int phA_l,int phB_h,int phB_l,int phC_h,int phC_l, int en){
+BLDCDriver6PWM::BLDCDriver6PWM(int phA_h,int phA_l,int phB_h,int phB_l,int phC_h,int phC_l, int en) {
   // Pin initialization
   pwmA_h = phA_h;
   pwmB_h = phB_h;
@@ -23,9 +23,9 @@ BLDCDriver6PWM::BLDCDriver6PWM(int phA_h,int phA_l,int phB_h,int phB_l,int phC_h
 }
 
 // enable motor driver
-void  BLDCDriver6PWM::enable(){
+void  BLDCDriver6PWM::enable() {
     // enable_pin the driver - if enable_pin pin available
-    if ( _isset(enable_pin) ) digitalWrite(enable_pin, enable_active_high);
+    if ( _isset(enable_pin) ) { digitalWrite(enable_pin, enable_active_high); }
     // set phase state enabled
     setPhaseState(PhaseState::PHASE_ON, PhaseState::PHASE_ON, PhaseState::PHASE_ON);
     // set zero to PWM
@@ -40,7 +40,7 @@ void BLDCDriver6PWM::disable()
   // set zero to PWM
   setPwm(0, 0, 0);
   // disable the driver - if enable_pin pin available
-  if ( _isset(enable_pin) ) digitalWrite(enable_pin, !enable_active_high);
+  if ( _isset(enable_pin) ) { digitalWrite(enable_pin, !enable_active_high); }
 
 }
 
@@ -54,11 +54,11 @@ int BLDCDriver6PWM::init() {
   pinMode(pwmA_l, OUTPUT);
   pinMode(pwmB_l, OUTPUT);
   pinMode(pwmC_l, OUTPUT);
-  if(_isset(enable_pin)) pinMode(enable_pin, OUTPUT);
+  if(_isset(enable_pin)) { pinMode(enable_pin, OUTPUT); }
 
 
   // sanity check for the voltage limit configuration
-  if( !_isset(voltage_limit) || voltage_limit > voltage_power_supply) voltage_limit =  voltage_power_supply;
+  if( (!_isset(voltage_limit)) || (voltage_limit > voltage_power_supply)) { voltage_limit =  voltage_power_supply; } // TLD order of operations check
 
   // set phase state to disabled
   phase_state[0] = PhaseState::PHASE_OFF;
@@ -72,7 +72,7 @@ int BLDCDriver6PWM::init() {
   // hardware specific function - depending on driver and mcu
   params = _configure6PWM(pwm_frequency, dead_zone, pwmA_h,pwmA_l, pwmB_h,pwmB_l, pwmC_h,pwmC_l);
   initialized = (params!=SIMPLEFOC_DRIVER_INIT_FAILED);
-  return params!=SIMPLEFOC_DRIVER_INIT_FAILED;
+  return(params!=SIMPLEFOC_DRIVER_INIT_FAILED);
 }
 
 

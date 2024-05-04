@@ -20,18 +20,18 @@
 //
 // the flags are defined in the imxrt.h file
 // https://github.com/PaulStoffregen/cores/blob/dd6aa8419ee173a0a6593eab669fbff54ed85f48/teensy4/imxrt.h#L9662-L9693
-int flexpwm_submodule_to_trig(IMXRT_FLEXPWM_t* flexpwm, int submodule){
-  if(submodule <0 && submodule > 3) return -1;
-  if(flexpwm == &IMXRT_FLEXPWM1){
-      return XBARA1_IN_FLEXPWM1_PWM1_OUT_TRIG0 + submodule; 
-  }else if(flexpwm == &IMXRT_FLEXPWM2){
-      return XBARA1_IN_FLEXPWM2_PWM1_OUT_TRIG0 + submodule;
-  }else if(flexpwm == &IMXRT_FLEXPWM3){
-      return XBARA1_IN_FLEXPWM3_PWM1_OUT_TRIG0 + submodule;
-  }else if(flexpwm == &IMXRT_FLEXPWM4){
-      return XBARA1_IN_FLEXPWM4_PWM1_OUT_TRIG0 + submodule;
+int flexpwm_submodule_to_trig(IMXRT_FLEXPWM_t* flexpwm, int submodule) {
+  if((submodule <0) && (submodule > 3)) { return(-1); } // TLD order of operations check
+  if(flexpwm == &IMXRT_FLEXPWM1) {
+    return(XBARA1_IN_FLEXPWM1_PWM1_OUT_TRIG0 + submodule); 
+  } else if(flexpwm == &IMXRT_FLEXPWM2) {
+    return(XBARA1_IN_FLEXPWM2_PWM1_OUT_TRIG0 + submodule);
+  } else if(flexpwm == &IMXRT_FLEXPWM3) {
+    return(XBARA1_IN_FLEXPWM3_PWM1_OUT_TRIG0 + submodule);
+  } else if(flexpwm == &IMXRT_FLEXPWM4) {
+    return(XBARA1_IN_FLEXPWM4_PWM1_OUT_TRIG0 + submodule);
   }
-  return -1;
+  return(-1);
 }
 
 // function finding the EXT_SYNC event given the flexpwm timer and the submodule
@@ -40,29 +40,29 @@ int flexpwm_submodule_to_trig(IMXRT_FLEXPWM_t* flexpwm, int submodule){
 //
 // the flags are defined in the imxrt.h file
 // https://github.com/PaulStoffregen/cores/blob/dd6aa8419ee173a0a6593eab669fbff54ed85f48/teensy4/imxrt.h#L9757
-int flexpwm_submodule_to_ext_sync(IMXRT_FLEXPWM_t* flexpwm, int submodule){
-  if(submodule <0 && submodule > 3) return -1;
-  if(flexpwm == &IMXRT_FLEXPWM1){
-      return XBARA1_OUT_FLEXPWM1_PWM0_EXT_SYNC + submodule; 
-  }else if(flexpwm == &IMXRT_FLEXPWM2){
-      return XBARA1_OUT_FLEXPWM2_PWM0_EXT_SYNC + submodule;
-  }else if(flexpwm == &IMXRT_FLEXPWM3){
-      return XBARA1_OUT_FLEXPWM3_EXT_SYNC0 + submodule; // TODO verify why they are not called PWM0_EXT_SYNC but EXT_SYNC0
-  }else if(flexpwm == &IMXRT_FLEXPWM4){
-      return XBARA1_OUT_FLEXPWM4_EXT_SYNC0 + submodule; // TODO verify why they are not called PWM0_EXT_SYNC but EXT_SYNC0
+int flexpwm_submodule_to_ext_sync(IMXRT_FLEXPWM_t* flexpwm, int submodule) {
+  if((submodule <0) && (submodule > 3)) { return(-1); } // TLD order of operations check
+  if(flexpwm == &IMXRT_FLEXPWM1) {
+    return(XBARA1_OUT_FLEXPWM1_PWM0_EXT_SYNC + submodule); 
+  } else if(flexpwm == &IMXRT_FLEXPWM2) {
+    return(XBARA1_OUT_FLEXPWM2_PWM0_EXT_SYNC + submodule);
+  } else if(flexpwm == &IMXRT_FLEXPWM3) {
+    return(XBARA1_OUT_FLEXPWM3_EXT_SYNC0 + submodule); // TODO verify why they are not called PWM0_EXT_SYNC but EXT_SYNC0
+  } else if(flexpwm == &IMXRT_FLEXPWM4) {
+    return(XBARA1_OUT_FLEXPWM4_EXT_SYNC0 + submodule); // TODO verify why they are not called PWM0_EXT_SYNC but EXT_SYNC0
   }
-  return -1;
+  return(-1);
 }
 
 // The i.MXRT1062 uses one config register per two XBAR outputs, so a helper
 // function to make code more readable. 
 void xbar_connect(unsigned int input, unsigned int output)
 {
-  if (input >= 88) return;
-  if (output >= 132) return;
+  if(input >= 88) { return; }
+  if(output >= 132) { return; }
   volatile uint16_t *xbar = &XBARA1_SEL0 + (output / 2);
   uint16_t val = *xbar;
-  if (!(output & 1)) {
+  if(!(output & 1)) {
     val = (val & 0xFF00) | input;
   } else {
     val = (val & 0x00FF) | (input << 8);
@@ -79,130 +79,130 @@ int half_cycle = 0;
 
 // function which finds the flexpwm instance for a pin
 // if it does not belong to the flexpwm timer it returns a nullpointer
-IMXRT_FLEXPWM_t* get_flexpwm(uint8_t pin){
+IMXRT_FLEXPWM_t* get_flexpwm(uint8_t pin) {
  
   const struct pwm_pin_info_struct *info;
-  if (pin >= CORE_NUM_DIGITAL) {
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-    char s[60];
-    sprintf (s, "TEENSY-DRV: ERR: Pin: %d not Flextimer pin!", pin);
-    SIMPLEFOC_DEBUG(s);
-#endif
-    return nullptr;
+  if(pin >= CORE_NUM_DIGITAL) {
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
+      char s[60];
+      sprintf (s, "TEENSY-DRV: ERR: Pin: %d not Flextimer pin!", pin);
+      SIMPLEFOC_DEBUG(s);
+    #endif
+    return(nullptr);
   }
   info = pwm_pin_info + pin;
   // FlexPWM pin
   IMXRT_FLEXPWM_t *flexpwm;
-  switch ((info->module >> 4) & 3) {
-    case 0: flexpwm = &IMXRT_FLEXPWM1; break;
-    case 1: flexpwm = &IMXRT_FLEXPWM2; break;
-    case 2: flexpwm = &IMXRT_FLEXPWM3; break;
+  switch((info->module >> 4) & 3) {
+    case(0): flexpwm = &IMXRT_FLEXPWM1; break;
+    case(1): flexpwm = &IMXRT_FLEXPWM2; break;
+    case(2): flexpwm = &IMXRT_FLEXPWM3; break;
     default: flexpwm = &IMXRT_FLEXPWM4;
   }
-  if(flexpwm != nullptr){
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-    char s[60];
-    sprintf (s, "TEENSY-DRV: Pin: %d on Flextimer %d.", pin, ((info->module >> 4) & 3) + 1);
-    SIMPLEFOC_DEBUG(s);
-#endif
-    return flexpwm;
+  if(flexpwm != nullptr) {
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
+      char s[60];
+      sprintf (s, "TEENSY-DRV: Pin: %d on Flextimer %d.", pin, ((info->module >> 4) & 3) + 1);
+      SIMPLEFOC_DEBUG(s);
+    #endif
+    return(flexpwm);
   } 
-  return nullptr;
+  return(nullptr);
 }
 
 
 // function which finds the timer submodule for a pin
 // if it does not belong to the submodule it returns a -1
-int get_submodule(uint8_t pin){
+int get_submodule(uint8_t pin) {
  
   const struct pwm_pin_info_struct *info;
-  if (pin >= CORE_NUM_DIGITAL){
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-    char s[60];
-    sprintf (s, "TEENSY-DRV: ERR: Pin: %d not Flextimer pin!", pin);
-    SIMPLEFOC_DEBUG(s);
-#endif
-    return -1;
+  if(pin >= CORE_NUM_DIGITAL) {
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
+      char s[60];
+      sprintf (s, "TEENSY-DRV: ERR: Pin: %d not Flextimer pin!", pin);
+      SIMPLEFOC_DEBUG(s);
+    #endif
+    return(-1);
   } 
   
   info = pwm_pin_info + pin;
   int sm1 = info->module&0x3;
 
-  if (sm1 >= 0 && sm1 < 4) {
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-    char s[60];
-    sprintf (s, "TEENSY-DRV: Pin %d on submodule %d.", pin, sm1);
-    SIMPLEFOC_DEBUG(s);
-#endif
-    return sm1;
-  }  else  {
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-    char s[50];
-    sprintf (s, "TEENSY-DRV: ERR: Pin: %d not in submodule!", pin);
-    SIMPLEFOC_DEBUG(s);
-#endif
-    return -1; 
+  if((sm1 >= 0) && (sm1 < 4)) { // TLD order of operations check
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
+      char s[60];
+      sprintf (s, "TEENSY-DRV: Pin %d on submodule %d.", pin, sm1);
+      SIMPLEFOC_DEBUG(s);
+    #endif
+    return(sm1);
+  } else {
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
+      char s[50];
+      sprintf (s, "TEENSY-DRV: ERR: Pin: %d not in submodule!", pin);
+      SIMPLEFOC_DEBUG(s);
+    #endif
+    return(-1); 
   }
 }
 
 // function which finds the flexpwm instance for a pair of pins
 // if they do not belong to the same timer it returns a nullpointer
-IMXRT_FLEXPWM_t* get_flexpwm(uint8_t pin, uint8_t pin1){
+IMXRT_FLEXPWM_t* get_flexpwm(uint8_t pin, uint8_t pin1) {
  
   const struct pwm_pin_info_struct *info;
-  if (pin >= CORE_NUM_DIGITAL || pin1 >= CORE_NUM_DIGITAL) {
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-    char s[60];
-    sprintf (s, "TEENSY-DRV: ERR: Pins: %d, %d not Flextimer pins!", pin, pin1);
-    SIMPLEFOC_DEBUG(s);
-#endif
-    return nullptr;
+  if((pin >= CORE_NUM_DIGITAL) || (pin1 >= CORE_NUM_DIGITAL)) { // TLD order of operations check
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
+      char s[60];
+      sprintf (s, "TEENSY-DRV: ERR: Pins: %d, %d not Flextimer pins!", pin, pin1);
+      SIMPLEFOC_DEBUG(s);
+    #endif
+    return(nullptr);
   }
   info = pwm_pin_info + pin;
   // FlexPWM pin
   IMXRT_FLEXPWM_t *flexpwm1,*flexpwm2;
-  switch ((info->module >> 4) & 3) {
-    case 0: flexpwm1 = &IMXRT_FLEXPWM1; break;
-    case 1: flexpwm1 = &IMXRT_FLEXPWM2; break;
-    case 2: flexpwm1 = &IMXRT_FLEXPWM3; break;
+  switch((info->module >> 4) & 3) {
+    case(0): flexpwm1 = &IMXRT_FLEXPWM1; break;
+    case(1): flexpwm1 = &IMXRT_FLEXPWM2; break;
+    case(2): flexpwm1 = &IMXRT_FLEXPWM3; break;
     default: flexpwm1 = &IMXRT_FLEXPWM4;
   }
   
   info = pwm_pin_info + pin1;
-  switch ((info->module >> 4) & 3) {
-    case 0: flexpwm2 = &IMXRT_FLEXPWM1; break;
-    case 1: flexpwm2 = &IMXRT_FLEXPWM2; break;
-    case 2: flexpwm2 = &IMXRT_FLEXPWM3; break;
+  switch((info->module >> 4) & 3) {
+    case(0): flexpwm2 = &IMXRT_FLEXPWM1; break;
+    case(1): flexpwm2 = &IMXRT_FLEXPWM2; break;
+    case(2): flexpwm2 = &IMXRT_FLEXPWM3; break;
     default: flexpwm2 = &IMXRT_FLEXPWM4;
   }
-  if(flexpwm1 == flexpwm2){
+  if(flexpwm1 == flexpwm2) {
     char s[60];
     sprintf (s, "TEENSY-DRV: Pins: %d, %d on Flextimer %d.", pin, pin1, ((info->module >> 4) & 3) + 1);
     SIMPLEFOC_DEBUG(s);
-    return flexpwm1;
+    return(flexpwm1);
   } else {
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-    char s[60];
-    sprintf (s, "TEENSY-DRV: ERR: Pins: %d, %d not in same Flextimer!", pin, pin1);
-    SIMPLEFOC_DEBUG(s);
-#endif
-    return nullptr; 
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
+      char s[60];
+      sprintf (s, "TEENSY-DRV: ERR: Pins: %d, %d not in same Flextimer!", pin, pin1);
+      SIMPLEFOC_DEBUG(s);
+    #endif
+    return(nullptr); 
   }
 }
 
 
 // function which finds the timer submodule for a pair of pins
 // if they do not belong to the same submodule it returns a -1
-int get_submodule(uint8_t pin, uint8_t pin1){
+int get_submodule(uint8_t pin, uint8_t pin1) {
  
   const struct pwm_pin_info_struct *info;
-  if (pin >= CORE_NUM_DIGITAL || pin1 >= CORE_NUM_DIGITAL){
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-    char s[60];
-    sprintf (s, "TEENSY-DRV: ERR: Pins: %d, %d not Flextimer pins!", pin, pin1);
-    SIMPLEFOC_DEBUG(s);
-#endif
-    return -1;
+  if((pin >= CORE_NUM_DIGITAL) || (pin1 >= CORE_NUM_DIGITAL)) { // TLD order of operations check
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
+      char s[60];
+      sprintf (s, "TEENSY-DRV: ERR: Pins: %d, %d not Flextimer pins!", pin, pin1);
+      SIMPLEFOC_DEBUG(s);
+    #endif
+    return(-1);
   } 
   
   info = pwm_pin_info + pin;
@@ -210,34 +210,34 @@ int get_submodule(uint8_t pin, uint8_t pin1){
   info = pwm_pin_info + pin1;
   int sm2 = info->module&0x3;
 
-  if (sm1 == sm2) {
+  if(sm1 == sm2) {
     char s[60];
     sprintf (s, "TEENSY-DRV: Pins: %d, %d on submodule %d.", pin, pin1, sm1);
     SIMPLEFOC_DEBUG(s);
-    return sm1;
-  }  else  {
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-    char s[50];
-    sprintf (s, "TEENSY-DRV: ERR: Pins: %d, %d not in same submodule!", pin, pin1);
-    SIMPLEFOC_DEBUG(s);
-#endif
-    return -1; 
+    return(sm1);
+  } else {
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
+      char s[50];
+      sprintf (s, "TEENSY-DRV: ERR: Pins: %d, %d not in same submodule!", pin, pin1);
+      SIMPLEFOC_DEBUG(s);
+    #endif
+    return(-1); 
   }
 }
 
 
 // function which finds the timer submodule for a pair of pins
 // if they do not belong to the same submodule it returns a -1
-int get_inverted_channel(uint8_t pin, uint8_t pin1){
+int get_inverted_channel(uint8_t pin, uint8_t pin1) {
  
   const struct pwm_pin_info_struct *info;
-  if (pin >= CORE_NUM_DIGITAL || pin1 >= CORE_NUM_DIGITAL){
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-    char s[60];
-    sprintf (s, "TEENSY-DRV: ERR: Pins: %d, %d not Flextimer pins!", pin, pin1);
-    SIMPLEFOC_DEBUG(s);
-#endif
-    return -1;
+  if((pin >= CORE_NUM_DIGITAL) || (pin1 >= CORE_NUM_DIGITAL)) { // TLD order of operations check
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
+      char s[60];
+      sprintf (s, "TEENSY-DRV: ERR: Pins: %d, %d not Flextimer pins!", pin, pin1);
+      SIMPLEFOC_DEBUG(s);
+    #endif
+    return(-1);
   } 
   
   info = pwm_pin_info + pin;
@@ -245,27 +245,27 @@ int get_inverted_channel(uint8_t pin, uint8_t pin1){
   info = pwm_pin_info + pin1;
   int ch2 = info->channel;
 
-  if (ch1 != 1) {
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-    char s[60];
-    sprintf (s, "TEENSY-DRV: ERR: Pin: %d on channel %s - only A supported", pin1, ch1==2 ? "B" : "X");
-    SIMPLEFOC_DEBUG(s);
-#endif
-    return -1;
-  }  else  if (ch2 != 2) {
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-    char s[60];
-    sprintf (s, "TEENSY-DRV: ERR: Inverted pin: %d on channel %s - only B supported", pin1, ch2==1 ? "A" : "X");
-    SIMPLEFOC_DEBUG(s);
-#endif
-    return -1;
+  if(ch1 != 1) {
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
+      char s[60];
+      sprintf (s, "TEENSY-DRV: ERR: Pin: %d on channel %s - only A supported", pin1, ch1==2 ? "B" : "X");
+      SIMPLEFOC_DEBUG(s);
+    #endif
+    return(-1);
+  } else if(ch2 != 2) {
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
+      char s[60];
+      sprintf (s, "TEENSY-DRV: ERR: Inverted pin: %d on channel %s - only B supported", pin1, ch2==1 ? "A" : "X");
+      SIMPLEFOC_DEBUG(s);
+    #endif
+    return(-1);
   } else {
-#ifdef SIMPLEFOC_TEENSY_DEBUG
-    char s[60];
-    sprintf (s, "TEENSY-DRV: Pin: %d on channel B inverted.", pin1);
-    SIMPLEFOC_DEBUG(s);
-#endif 
-return ch2;
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
+      char s[60];
+      sprintf (s, "TEENSY-DRV: Pin: %d on channel B inverted.", pin1);
+      SIMPLEFOC_DEBUG(s);
+    #endif 
+    return(ch2);
   } 
 }
 
@@ -284,13 +284,13 @@ void setup_pwm_pair (IMXRT_FLEXPWM_t * flexpwm, int submodule, bool ext_sync,  c
   uint32_t newdiv = (uint32_t)((float)F_BUS_ACTUAL / frequency + 0.5f);
 	uint32_t prescale = 0;
 	//printf(" div=%lu\n", newdiv);
-	while (newdiv > 65535 && prescale < 7) {
+	while((newdiv > 65535) && (prescale < 7)) { // TLD order of operations check
 		newdiv = newdiv >> 1;
 		prescale = prescale + 1;
 	}
-	if (newdiv > 65535) {
+	if(newdiv > 65535) {
 		newdiv = 65535;
-	} else if (newdiv < 2) {
+	} else if(newdiv < 2) {
 		newdiv = 2;
 	}
 
@@ -309,7 +309,7 @@ void setup_pwm_pair (IMXRT_FLEXPWM_t * flexpwm, int submodule, bool ext_sync,  c
   flexpwm->SM[submodule].CTRL  = FLEXPWM_SMCTRL_FULL | FLEXPWM_SMCTRL_HALF | FLEXPWM_SMCTRL_PRSC(prescale) ;
   // https://github.com/PaulStoffregen/cores/blob/70ba01accd728abe75ebfc8dcd8b3d3a8f3e3f25/teensy4/imxrt.h#L4948
   flexpwm->SM[submodule].OCTRL = 0; //FLEXPWM_SMOCTRL_POLA | FLEXPWM_SMOCTRL_POLB;//channel_to_invert==2 ? 0 : FLEXPWM_SMOCTRL_POLA | FLEXPWM_SMOCTRL_POLB ;
-  if (!ext_sync) flexpwm->SM[submodule].TCTRL = FLEXPWM_SMTCTRL_OUT_TRIG_EN (0b000010)  ; // sync trig out on VAL1 match if master timer
+  if(!ext_sync) { flexpwm->SM[submodule].TCTRL = FLEXPWM_SMTCTRL_OUT_TRIG_EN (0b000010); } // sync trig out on VAL1 match if master timer
   flexpwm->SM[submodule].DTCNT0 = dead_time ;  // should try this out (deadtime control)
   flexpwm->SM[submodule].DTCNT1 = dead_time ;  // should try this out (deadtime control)
   flexpwm->SM[submodule].INIT = -half_cycle;      // count from -HALFCYCLE to +HALFCYCLE
@@ -335,7 +335,7 @@ void startup_pwm_pair (IMXRT_FLEXPWM_t * flexpwm, int submodule)
 
 
 // PWM setting on the high and low pair of the PWM channels
-void write_pwm_pair(IMXRT_FLEXPWM_t * flexpwm, int submodule, float duty){
+void write_pwm_pair(IMXRT_FLEXPWM_t * flexpwm, int submodule, float duty) {
   int mid_pwm = int((half_cycle)/2.0f);
   int count_pwm = int(mid_pwm*(duty*2-1)) + mid_pwm;
 
@@ -346,7 +346,7 @@ void write_pwm_pair(IMXRT_FLEXPWM_t * flexpwm, int submodule, float duty){
 
 
 // // PWM setting on the high and low pair of the PWM channels
-void write_pwm_on_pin(IMXRT_FLEXPWM_t * flexpwm, int submodule, float duty){
+void write_pwm_on_pin(IMXRT_FLEXPWM_t * flexpwm, int submodule, float duty) {
   int count = flexpwm->SM[submodule].VAL1;
   int count_pwm = int(count*duty);
 
@@ -367,26 +367,26 @@ void write_pwm_on_pin(IMXRT_FLEXPWM_t *p, unsigned int submodule, uint8_t channe
 	uint16_t mask = 1 << submodule;
 	uint32_t modulo = p->SM[submodule].VAL1;
 	uint32_t cval = ((uint32_t)val * (modulo + 1)) >> analog_write_res;
-	if (cval > modulo) cval = modulo; // TODO: is this check correct?
+	if(cval > modulo) { cval = modulo; } // TODO: is this check correct?
 
 	//printf("flexpwmWrite, p=%08lX, sm=%d, ch=%c, cval=%ld\n",
 		//(uint32_t)p, submodule, channel == 0 ? 'X' : (channel == 1 ? 'A' : 'B'), cval);
 	p->MCTRL |= FLEXPWM_MCTRL_CLDOK(mask);
-	switch (channel) {
-	  case 0: // X
-		p->SM[submodule].VAL0 = modulo - cval;
-		p->OUTEN |= FLEXPWM_OUTEN_PWMX_EN(mask);
-		//printf(" write channel X\n");
-		break;
-	  case 1: // A
-		p->SM[submodule].VAL3 = cval;
-		p->OUTEN |= FLEXPWM_OUTEN_PWMA_EN(mask);
-		//printf(" write channel A\n");
-		break;
-	  case 2: // B
-		p->SM[submodule].VAL5 = cval;
-		p->OUTEN |= FLEXPWM_OUTEN_PWMB_EN(mask);
-		//printf(" write channel B\n");
+	switch(channel) {
+	  case(0): // X
+      p->SM[submodule].VAL0 = modulo - cval;
+      p->OUTEN |= FLEXPWM_OUTEN_PWMX_EN(mask);
+      //printf(" write channel X\n");
+      break;
+	  case(1): // A
+      p->SM[submodule].VAL3 = cval;
+      p->OUTEN |= FLEXPWM_OUTEN_PWMA_EN(mask);
+      //printf(" write channel A\n");
+      break;
+	  case(2): // B
+      p->SM[submodule].VAL5 = cval;
+      p->OUTEN |= FLEXPWM_OUTEN_PWMB_EN(mask);
+      //printf(" write channel B\n");
 	}
 	p->MCTRL |= FLEXPWM_MCTRL_LDOK(mask);
 }
@@ -396,8 +396,8 @@ void write_pwm_on_pin(IMXRT_FLEXPWM_t *p, unsigned int submodule, uint8_t channe
 // - Stepper motor - 6PWM setting
 // - hardware specific
 void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, const int pinA_l,  const int pinB_h, const int pinB_l, const int pinC_h, const int pinC_l) {
-  if(!pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 25khz
-  else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to 50kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency)) ) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 25khz
+  else { pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); } // constrain to 50kHz max
   
   IMXRT_FLEXPWM_t *flexpwmA,*flexpwmB,*flexpwmC;
   int submoduleA,submoduleB,submoduleC;
@@ -412,23 +412,23 @@ void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, cons
   submoduleC = get_submodule(pinC_h,pinC_l);
   inverted_channelC = get_inverted_channel(pinC_h,pinC_l);
 
-  if((flexpwmA == nullptr) || (flexpwmB == nullptr) || (flexpwmC == nullptr) ){
-#ifdef SIMPLEFOC_TEENSY_DEBUG
+  if((flexpwmA == nullptr) || (flexpwmB == nullptr) || (flexpwmC == nullptr) ) {
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
       SIMPLEFOC_DEBUG("TEENSY-DRV: ERR: Flextimer problem - failed driver config!");
-#endif
-    return SIMPLEFOC_DRIVER_INIT_FAILED;
+    #endif
+    return(SIMPLEFOC_DRIVER_INIT_FAILED);
   }
-  if((submoduleA < 0) || (submoduleB < 0) || (submoduleC < 0) ){
-#ifdef SIMPLEFOC_TEENSY_DEBUG
+  if((submoduleA < 0) || (submoduleB < 0) || (submoduleC < 0) ) {
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
       SIMPLEFOC_DEBUG("TEENSY-DRV: ERR: Flextimer submodule problem - failed driver config!");
-#endif
-    return SIMPLEFOC_DRIVER_INIT_FAILED;
+    #endif
+    return(SIMPLEFOC_DRIVER_INIT_FAILED);
   }
-  if((inverted_channelA < 0) || (inverted_channelB < 0) || (inverted_channelC < 0) ){
-#ifdef SIMPLEFOC_TEENSY_DEBUG
+  if((inverted_channelA < 0) || (inverted_channelB < 0) || (inverted_channelC < 0) ) {
+    #ifdef SIMPLEFOC_TEENSY_DEBUG
       SIMPLEFOC_DEBUG("TEENSY-DRV: ERR: Flextimer channel problem - failed driver config!");
-#endif
-    return SIMPLEFOC_DRIVER_INIT_FAILED;
+    #endif
+    return(SIMPLEFOC_DRIVER_INIT_FAILED);
   }
 
 
@@ -469,7 +469,7 @@ void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, cons
   *portConfigRegister(pinC_h) = pwm_pin_info[pinC_h].muxval ;
   *portConfigRegister(pinC_l) = pwm_pin_info[pinC_l].muxval ;
   
-  return params;
+  return(params);
 }
 
 
@@ -477,7 +477,7 @@ void* _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, cons
 // function setting the pwm duty cycle to the hardware
 // - Stepper motor - 6PWM setting
 // - hardware specific
-void _writeDutyCycle6PWM(float dc_a,  float dc_b, float dc_c, PhaseState *phase_state, void* params){
+void _writeDutyCycle6PWM(float dc_a,  float dc_b, float dc_c, PhaseState *phase_state, void* params) {
   _UNUSED(phase_state);
   write_pwm_pair (((Teensy4DriverParams*)params)->flextimers[0], ((Teensy4DriverParams*)params)->submodules[0], dc_a);
   write_pwm_pair (((Teensy4DriverParams*)params)->flextimers[1], ((Teensy4DriverParams*)params)->submodules[1], dc_b);
@@ -491,8 +491,8 @@ void _writeDutyCycle6PWM(float dc_a,  float dc_b, float dc_c, PhaseState *phase_
 // in generic case dont do anything
  void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const int pinC) {
 
-  if(!pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 25khz
-  else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to 50kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency)) ) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 25khz
+  else { pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); } // constrain to 50kHz max
   
   IMXRT_FLEXPWM_t *flexpwmA,*flexpwmB,*flexpwmC;
   int submoduleA,submoduleB,submoduleC;
@@ -527,13 +527,13 @@ void _writeDutyCycle6PWM(float dc_a,  float dc_b, float dc_c, PhaseState *phase_
   // *portConfigRegister(pinB) = pwm_pin_info[pinB].muxval ;
   // *portConfigRegister(pinC) = pwm_pin_info[pinC].muxval ;
 
-  return params;
+  return(params);
 }
 
 // function setting the pwm duty cycle to the hardware
 // - Stepper motor - 6PWM setting
 // - hardware specific
-void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params){
+void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params) {
   write_pwm_on_pin (((Teensy4DriverParams*)params)->flextimers[0], ((Teensy4DriverParams*)params)->submodules[0], dc_a);
   write_pwm_on_pin (((Teensy4DriverParams*)params)->flextimers[1], ((Teensy4DriverParams*)params)->submodules[1], dc_b);
   write_pwm_on_pin (((Teensy4DriverParams*)params)->flextimers[2], ((Teensy4DriverParams*)params)->submodules[2], dc_c);

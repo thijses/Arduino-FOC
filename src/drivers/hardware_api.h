@@ -14,15 +14,15 @@
 
 // used for 1-PWM, 2-PWM, 3-PWM, and 4-PWM modes
 #ifndef SIMPLEFOC_PWM_ACTIVE_HIGH
-#define SIMPLEFOC_PWM_ACTIVE_HIGH true
+  #define SIMPLEFOC_PWM_ACTIVE_HIGH true
 #endif
 // used for 6-PWM mode, high-side
 #ifndef SIMPLEFOC_PWM_HIGHSIDE_ACTIVE_HIGH
-#define SIMPLEFOC_PWM_HIGHSIDE_ACTIVE_HIGH true
+  #define SIMPLEFOC_PWM_HIGHSIDE_ACTIVE_HIGH true
 #endif
 // used for 6-PWM mode, low-side
 #ifndef SIMPLEFOC_PWM_LOWSIDE_ACTIVE_HIGH
-#define SIMPLEFOC_PWM_LOWSIDE_ACTIVE_HIGH true
+  #define SIMPLEFOC_PWM_LOWSIDE_ACTIVE_HIGH true
 #endif
 
 

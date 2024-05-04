@@ -1,6 +1,6 @@
 #include "StepperDriver4PWM.h"
 
-StepperDriver4PWM::StepperDriver4PWM(int ph1A,int ph1B,int ph2A,int ph2B,int en1, int en2){
+StepperDriver4PWM::StepperDriver4PWM(int ph1A,int ph1B,int ph2A,int ph2B,int en1, int en2) {
   // Pin initialization
   pwm1A = ph1A;
   pwm1B = ph1B;
@@ -19,10 +19,10 @@ StepperDriver4PWM::StepperDriver4PWM(int ph1A,int ph1B,int ph2A,int ph2B,int en1
 }
 
 // enable motor driver
-void  StepperDriver4PWM::enable(){
+void  StepperDriver4PWM::enable() {
     // enable_pin the driver - if enable_pin pin available
-    if ( _isset(enable_pin1) ) digitalWrite(enable_pin1, HIGH);
-    if ( _isset(enable_pin2) ) digitalWrite(enable_pin2, HIGH);
+    if ( _isset(enable_pin1) ) { digitalWrite(enable_pin1, HIGH); }
+    if ( _isset(enable_pin2) ) { digitalWrite(enable_pin2, HIGH); }
     // set zero to PWM
     setPwm(0,0);
 }
@@ -33,8 +33,8 @@ void StepperDriver4PWM::disable()
   // set zero to PWM
   setPwm(0, 0);
   // disable the driver - if enable_pin pin available
-  if ( _isset(enable_pin1) ) digitalWrite(enable_pin1, LOW);
-  if ( _isset(enable_pin2) ) digitalWrite(enable_pin2, LOW);
+  if ( _isset(enable_pin1) ) { digitalWrite(enable_pin1, LOW); }
+  if ( _isset(enable_pin2) ) { digitalWrite(enable_pin2, LOW); }
 
 }
 
@@ -46,17 +46,17 @@ int StepperDriver4PWM::init() {
   pinMode(pwm1B, OUTPUT);
   pinMode(pwm2A, OUTPUT);
   pinMode(pwm2B, OUTPUT);
-  if( _isset(enable_pin1) ) pinMode(enable_pin1, OUTPUT);
-  if( _isset(enable_pin2) ) pinMode(enable_pin2, OUTPUT);
+  if( _isset(enable_pin1) ) { pinMode(enable_pin1, OUTPUT); }
+  if( _isset(enable_pin2) ) { pinMode(enable_pin2, OUTPUT); }
 
   // sanity check for the voltage limit configuration
-  if( !_isset(voltage_limit) || voltage_limit > voltage_power_supply) voltage_limit =  voltage_power_supply;
+  if( (!_isset(voltage_limit)) || (voltage_limit > voltage_power_supply)) { voltage_limit =  voltage_power_supply; } // TLD order of operations check
 
   // Set the pwm frequency to the pins
   // hardware specific function - depending on driver and mcu
   params = _configure4PWM(pwm_frequency, pwm1A, pwm1B, pwm2A, pwm2B);
   initialized = (params!=SIMPLEFOC_DRIVER_INIT_FAILED);  
-  return params!=SIMPLEFOC_DRIVER_INIT_FAILED;
+  return(params!=SIMPLEFOC_DRIVER_INIT_FAILED);
 }
 
 
@@ -67,15 +67,17 @@ void StepperDriver4PWM::setPwm(float Ualpha, float Ubeta) {
   Ualpha = _constrain(Ualpha, -voltage_limit, voltage_limit);
   Ubeta = _constrain(Ubeta, -voltage_limit, voltage_limit);
   // hardware specific writing
-  if( Ualpha > 0 )
+  if( Ualpha > 0 ) {
     duty_cycle1B = _constrain(abs(Ualpha)/voltage_power_supply,0.0f,1.0f);
-  else
+  } else {
     duty_cycle1A = _constrain(abs(Ualpha)/voltage_power_supply,0.0f,1.0f);
+  }
 
-  if( Ubeta > 0 )
+  if( Ubeta > 0 ) {
     duty_cycle2B = _constrain(abs(Ubeta)/voltage_power_supply,0.0f,1.0f);
-  else
+  } else {
     duty_cycle2A = _constrain(abs(Ubeta)/voltage_power_supply,0.0f,1.0f);
+  }
   // write to hardware
   _writeDutyCycle4PWM(duty_cycle1A, duty_cycle1B, duty_cycle2A, duty_cycle2B, params);
 }

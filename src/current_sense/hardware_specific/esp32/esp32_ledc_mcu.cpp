@@ -9,19 +9,19 @@
 #define _ADC_RESOLUTION 4095.0f
 
 // function reading an ADC value and returning the read voltage
-void* _configureADCInline(const void* driver_params, const int pinA,const int pinB,const int pinC){
+void* _configureADCInline(const void* driver_params, const int pinA,const int pinB,const int pinC) {
   _UNUSED(driver_params);
 
   pinMode(pinA, INPUT);
   pinMode(pinB, INPUT);
-  if( _isset(pinC) ) pinMode(pinC, INPUT);
+  if( _isset(pinC) ) { pinMode(pinC, INPUT); }
 
   GenericCurrentSenseParams* params = new GenericCurrentSenseParams {
     .pins = { pinA, pinB, pinC },
     .adc_voltage_conv = (_ADC_VOLTAGE)/(_ADC_RESOLUTION)
   };
 
-  return params;
+  return(params);
 }
 
 #endif

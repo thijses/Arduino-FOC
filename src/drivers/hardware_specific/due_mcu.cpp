@@ -36,19 +36,19 @@ static const uint32_t channelToId[] = { 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6
 
 
 // function setting the CMR register
-static void TC_SetCMR_ChannelA(Tc *tc, uint32_t chan, uint32_t v){  tc->TC_CHANNEL[chan].TC_CMR = (tc->TC_CHANNEL[chan].TC_CMR & 0xFFF0FFFF) | v;}
-static void TC_SetCMR_ChannelB(Tc *tc, uint32_t chan, uint32_t v){ tc->TC_CHANNEL[chan].TC_CMR = (tc->TC_CHANNEL[chan].TC_CMR & 0xF0FFFFFF) | v; }
+static void TC_SetCMR_ChannelA(Tc *tc, uint32_t chan, uint32_t v) {  tc->TC_CHANNEL[chan].TC_CMR = (tc->TC_CHANNEL[chan].TC_CMR & 0xFFF0FFFF) | v;}
+static void TC_SetCMR_ChannelB(Tc *tc, uint32_t chan, uint32_t v) { tc->TC_CHANNEL[chan].TC_CMR = (tc->TC_CHANNEL[chan].TC_CMR & 0xF0FFFFFF) | v; }
 
 
 // function which starts and syncs the timers 
 // if the pin is the true PWM pin this function does not do anything
-void syncTimers(uint32_t ulPin1,uint32_t ulPin2, uint32_t ulPin3 = -1, uint32_t ulPin4 = -1){
+void syncTimers(uint32_t ulPin1,uint32_t ulPin2, uint32_t ulPin3 = -1, uint32_t ulPin4 = -1) {
   uint32_t chNo1,chNo2,chNo3,chNo4;
   Tc *chTC1 = nullptr,*chTC2 = nullptr,*chTC3 = nullptr,*chTC4 = nullptr;
 
   // configure timer channel for the first pin if it is a timer pin
   uint32_t attr = g_APinDescription[ulPin1].ulPinAttribute;
-  if ((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) {
+  if((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) {
     ETCChannel channel1 = g_APinDescription[ulPin1].ulTCChannel;
     chNo1 = channelToChNo[channel1];
     chTC1 = channelToTC[channel1];
@@ -57,26 +57,26 @@ void syncTimers(uint32_t ulPin1,uint32_t ulPin2, uint32_t ulPin3 = -1, uint32_t 
     
   // configure timer channel for the first pin if it is a timer pin
   attr = g_APinDescription[ulPin2].ulPinAttribute;
-  if ((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) {
+  if((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) {
     ETCChannel channel2 = g_APinDescription[ulPin2].ulTCChannel;
     chNo2 = channelToChNo[channel2];
     chTC2 = channelToTC[channel2];
     TCChanEnabled[channelToId[channel2]] = 1;
   }
-  if(ulPin3 > 0 ){
+  if(ulPin3 > 0 ) {
     // configure timer channel for the first pin if it is a timer pin
     attr = g_APinDescription[ulPin3].ulPinAttribute;
-    if ((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) {
+    if((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) {
       ETCChannel channel3 = g_APinDescription[ulPin3].ulTCChannel;
       chNo3 = channelToChNo[channel3];
       chTC3 = channelToTC[channel3];
       TCChanEnabled[channelToId[channel3]] = 1;
     }
   }
-  if(ulPin4  > 0 ){
+  if(ulPin4  > 0 ) {
     // configure timer channel for the first pin if it is a timer pin
     attr = g_APinDescription[ulPin4].ulPinAttribute;
-    if ((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) {
+    if((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) {
       ETCChannel channel4 = g_APinDescription[ulPin4].ulTCChannel;
       chNo4 = channelToChNo[channel4];
       chTC4 = channelToTC[channel4];
@@ -84,19 +84,19 @@ void syncTimers(uint32_t ulPin1,uint32_t ulPin2, uint32_t ulPin3 = -1, uint32_t 
     }
   }
   // start timers and make them synced
-  if(chTC1){ 
+  if(chTC1) { 
     TC_Start(chTC1, chNo1);
     chTC1->TC_BCR = TC_BCR_SYNC;
   }
-  if(chTC2){  
+  if(chTC2) {  
     TC_Start(chTC2, chNo2);
     chTC2->TC_BCR = TC_BCR_SYNC;
   }
-  if(chTC3 && ulPin3){ 
+  if(chTC3 && ulPin3) { 
     TC_Start(chTC3, chNo3);
     chTC3->TC_BCR = TC_BCR_SYNC;
   }
-  if(chTC4 && ulPin4){ 
+  if(chTC4 && ulPin4) { 
     TC_Start(chTC4, chNo4);
     chTC4->TC_BCR = TC_BCR_SYNC;
   }
@@ -104,15 +104,15 @@ void syncTimers(uint32_t ulPin1,uint32_t ulPin2, uint32_t ulPin3 = -1, uint32_t 
 
 // function configuring the pwm frequency for given pin
 // possible to supply the pwm pin and the timer pin 
-void initPWM(uint32_t ulPin, uint32_t pwm_freq){
+void initPWM(uint32_t ulPin, uint32_t pwm_freq) {
   // check which pin type
   uint32_t attr = g_APinDescription[ulPin].ulPinAttribute;
-  if ((attr & PIN_ATTR_PWM) == PIN_ATTR_PWM) { // if pwm pin
+  if((attr & PIN_ATTR_PWM) == PIN_ATTR_PWM) { // if pwm pin
 
-    if (!PWMEnabled) {
+    if(!PWMEnabled) {
       // PWM Startup code
       pmc_enable_periph_clk(PWM_INTERFACE_ID);
-			// this function does not work too well - I'll rewrite it
+      // this function does not work too well - I'll rewrite it
       // PWMC_ConfigureClocks(PWM_FREQUENCY * _max_pwm_value, 0, VARIANT_MCK);
 
       // finding the divisors an prescalers form FindClockConfiguration function
@@ -122,7 +122,7 @@ void initPWM(uint32_t ulPin, uint32_t pwm_freq){
 
       /* Find prescaler and divisor values */
       prescaler = (VARIANT_MCK / divisors[divisor]) / (pwm_freq*_max_pwm_value);
-      while ((prescaler > 255) && (divisor < 11)) {
+      while((prescaler > 255) && (divisor < 11)) {
           divisor++;
           prescaler = (VARIANT_MCK / divisors[divisor]) / (pwm_freq*_max_pwm_value);
       }
@@ -139,7 +139,7 @@ void initPWM(uint32_t ulPin, uint32_t pwm_freq){
     }
 
     uint32_t chan = g_APinDescription[ulPin].ulPWMChannel;
-    if ((g_pinStatus[ulPin] & 0xF) != PIN_STATUS_PWM) {
+    if((g_pinStatus[ulPin] & 0xF) != PIN_STATUS_PWM) {
       // Setup PWM for this pin
       PIO_Configure(g_APinDescription[ulPin].pPort,
           g_APinDescription[ulPin].ulPinType,
@@ -156,7 +156,7 @@ void initPWM(uint32_t ulPin, uint32_t pwm_freq){
     return;
   }
 
-  if ((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) { // if timer pin
+  if((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) { // if timer pin
     // We use MCLK/2 as clock.
     const uint32_t TC = VARIANT_MCK / 2 / pwm_freq ;
     // Setup Timer for this pin
@@ -166,26 +166,26 @@ void initPWM(uint32_t ulPin, uint32_t pwm_freq){
     Tc *chTC = channelToTC[channel];
     uint32_t interfaceID = channelToId[channel];
 
-      if (!TCChanEnabled[interfaceID]) {
-        pmc_enable_periph_clk(TC_INTERFACE_ID + interfaceID);
-        TC_Configure(chTC, chNo,
-          TC_CMR_TCCLKS_TIMER_CLOCK1 |
-          TC_CMR_WAVE |         // Waveform mode
-          TC_CMR_WAVSEL_UP_RC | // Counter running up and reset when equals to RC
-          TC_CMR_EEVT_XC0 |     // Set external events from XC0 (this setup TIOB as output)
-          TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_CLEAR |
-          TC_CMR_BCPB_CLEAR | TC_CMR_BCPC_CLEAR);
-        TC_SetRC(chTC, chNo, TC);
-      } 
+    if(!TCChanEnabled[interfaceID]) {
+      pmc_enable_periph_clk(TC_INTERFACE_ID + interfaceID);
+      TC_Configure(chTC, chNo,
+        TC_CMR_TCCLKS_TIMER_CLOCK1 |
+        TC_CMR_WAVE |         // Waveform mode
+        TC_CMR_WAVSEL_UP_RC | // Counter running up and reset when equals to RC
+        TC_CMR_EEVT_XC0 |     // Set external events from XC0 (this setup TIOB as output)
+        TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_CLEAR |
+        TC_CMR_BCPB_CLEAR | TC_CMR_BCPC_CLEAR);
+      TC_SetRC(chTC, chNo, TC);
+    } 
 
     // disable the counter on start
-    if (chA){
+    if(chA) {
       TC_SetCMR_ChannelA(chTC, chNo, TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_SET);
-    }else{
+    } else {
       TC_SetCMR_ChannelB(chTC, chNo, TC_CMR_BCPB_CLEAR | TC_CMR_BCPC_SET);
     }
     // configure input-ouput structure
-    if ((g_pinStatus[ulPin] & 0xF) != PIN_STATUS_PWM) {
+    if((g_pinStatus[ulPin] & 0xF) != PIN_STATUS_PWM) {
       PIO_Configure(g_APinDescription[ulPin].pPort,
           g_APinDescription[ulPin].ulPinType,
           g_APinDescription[ulPin].ulPin,
@@ -210,24 +210,25 @@ void initPWM(uint32_t ulPin, uint32_t pwm_freq){
 void setPwm(uint32_t ulPin, uint32_t ulValue) {
   // check pin type
   uint32_t attr = g_APinDescription[ulPin].ulPinAttribute;
-  if ((attr & PIN_ATTR_PWM) == PIN_ATTR_PWM) { // if pwm
+  if((attr & PIN_ATTR_PWM) == PIN_ATTR_PWM) { // if pwm
     uint32_t chan = g_APinDescription[ulPin].ulPWMChannel;
     PWMC_SetDutyCycle(PWM_INTERFACE, chan, ulValue);
     return;
   }
 
-  if ((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) { // if timer pin
+  if((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) { // if timer pin
     // get the timer variables 
     ETCChannel channel = g_APinDescription[ulPin].ulTCChannel;
     Tc *chTC = channelToTC[channel];
     uint32_t chNo = channelToChNo[channel];
     if(!ulValue) {
       // if the value 0 disable counter
-      if (channelToAB[channel])
+      if(channelToAB[channel]) {
         TC_SetCMR_ChannelA(chTC, chNo, TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_CLEAR);
-      else
+      } else {
         TC_SetCMR_ChannelB(chTC, chNo, TC_CMR_BCPB_CLEAR | TC_CMR_BCPC_CLEAR);
-    }else{
+      }
+    } else {
       // if the value not zero
       // calculate clock
       const uint32_t TC = VARIANT_MCK / 2 / _pwm_frequency;
@@ -236,10 +237,11 @@ void setPwm(uint32_t ulPin, uint32_t ulValue) {
       ulValue = ulValue * TC ;
       pwm_counter_vals[channel] = ulValue / _max_pwm_value;
       // enable counter
-      if (channelToAB[channel])
+      if(channelToAB[channel]) {
         TC_SetCMR_ChannelA(chTC, chNo, TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_SET);
-      else
+      } else {
         TC_SetCMR_ChannelB(chTC, chNo, TC_CMR_BCPB_CLEAR | TC_CMR_BCPC_SET);
+      }
     }
     
     return;
@@ -252,8 +254,8 @@ void TC0_Handler()
   // read/clear interrupt status
   TC_GetStatus(TC0, 0);
   // update the counters
-  if(pwm_counter_vals[0]) TC_SetRA(TC0, 0, pwm_counter_vals[0]);
-  if(pwm_counter_vals[1]) TC_SetRB(TC0, 0, pwm_counter_vals[1]);
+  if(pwm_counter_vals[0]) { TC_SetRA(TC0, 0, pwm_counter_vals[0]); }
+  if(pwm_counter_vals[1]) { TC_SetRB(TC0, 0, pwm_counter_vals[1]); }
 }
 
 void TC1_Handler()
@@ -261,8 +263,8 @@ void TC1_Handler()
   // read/clear interrupt status
   TC_GetStatus(TC0, 1);
   // update the counters
-  if(pwm_counter_vals[2]) TC_SetRA(TC0, 1, pwm_counter_vals[2]);
-  if(pwm_counter_vals[3]) TC_SetRB(TC0, 1, pwm_counter_vals[3]);
+  if(pwm_counter_vals[2]) { TC_SetRA(TC0, 1, pwm_counter_vals[2]); }
+  if(pwm_counter_vals[3]) { TC_SetRB(TC0, 1, pwm_counter_vals[3]); }
 }
 
 void TC2_Handler()
@@ -270,16 +272,16 @@ void TC2_Handler()
   // read/clear interrupt status
   TC_GetStatus(TC0, 2);
   // update the counters
-  if(pwm_counter_vals[4]) TC_SetRA(TC0, 2, pwm_counter_vals[4]);
-  if(pwm_counter_vals[5]) TC_SetRB(TC0, 2, pwm_counter_vals[5]);
+  if(pwm_counter_vals[4]) { TC_SetRA(TC0, 2, pwm_counter_vals[4]); }
+  if(pwm_counter_vals[5]) { TC_SetRB(TC0, 2, pwm_counter_vals[5]); }
 }
 void TC3_Handler()
 {
   // read/clear interrupt status
   TC_GetStatus(TC1, 0);
   // update the counters
-  if(pwm_counter_vals[6]) TC_SetRA(TC1, 0, pwm_counter_vals[6]);
-  if(pwm_counter_vals[7]) TC_SetRB(TC1, 0, pwm_counter_vals[7]);
+  if(pwm_counter_vals[6]) { TC_SetRA(TC1, 0, pwm_counter_vals[6]); }
+  if(pwm_counter_vals[7]) { TC_SetRB(TC1, 0, pwm_counter_vals[7]); }
 }
 
 void TC4_Handler()
@@ -287,8 +289,8 @@ void TC4_Handler()
   // read/clear interrupt status
   TC_GetStatus(TC1, 1);
   // update the counters
-  if(pwm_counter_vals[8]) TC_SetRA(TC1, 1, pwm_counter_vals[8]);
-  if(pwm_counter_vals[9]) TC_SetRB(TC1, 1, pwm_counter_vals[9]);
+  if(pwm_counter_vals[8]) { TC_SetRA(TC1, 1, pwm_counter_vals[8]); }
+  if(pwm_counter_vals[9]) { TC_SetRB(TC1, 1, pwm_counter_vals[9]); }
 }
 
 void TC5_Handler()
@@ -296,16 +298,16 @@ void TC5_Handler()
   // read/clear interrupt status
   TC_GetStatus(TC1, 2);
   // update the counters
-  if(pwm_counter_vals[10]) TC_SetRA(TC1, 2, pwm_counter_vals[10]);
-  if(pwm_counter_vals[11]) TC_SetRB(TC1, 2, pwm_counter_vals[11]);
+  if(pwm_counter_vals[10]) { TC_SetRA(TC1, 2, pwm_counter_vals[10]); }
+  if(pwm_counter_vals[11]) { TC_SetRB(TC1, 2, pwm_counter_vals[11]); }
 }
 void TC6_Handler()
 {
   // read/clear interrupt status
   TC_GetStatus(TC2, 0);
   // update the counters
-  if(pwm_counter_vals[12]) TC_SetRA(TC2, 0, pwm_counter_vals[12]);
-  if(pwm_counter_vals[13]) TC_SetRB(TC2, 0, pwm_counter_vals[13]);
+  if(pwm_counter_vals[12]) { TC_SetRA(TC2, 0, pwm_counter_vals[12]); }
+  if(pwm_counter_vals[13]) { TC_SetRB(TC2, 0, pwm_counter_vals[13]); }
 }
 
 void TC7_Handler()
@@ -313,8 +315,8 @@ void TC7_Handler()
   // read/clear interrupt status
   TC_GetStatus(TC2, 1);
   // update the counters
-  if(pwm_counter_vals[14]) TC_SetRA(TC2, 1, pwm_counter_vals[14]);
-  if(pwm_counter_vals[15]) TC_SetRB(TC2, 1, pwm_counter_vals[15]);
+  if(pwm_counter_vals[14]) { TC_SetRA(TC2, 1, pwm_counter_vals[14]); }
+  if(pwm_counter_vals[15]) { TC_SetRB(TC2, 1, pwm_counter_vals[15]); }
 }
 
 void TC8_Handler()
@@ -322,8 +324,8 @@ void TC8_Handler()
   // read/clear interrupt status
   TC_GetStatus(TC2, 2);
   // update the counters
-  if(pwm_counter_vals[16]) TC_SetRA(TC2, 2, pwm_counter_vals[16]);
-  if(pwm_counter_vals[17]) TC_SetRB(TC2, 2, pwm_counter_vals[17]);
+  if(pwm_counter_vals[16]) { TC_SetRA(TC2, 2, pwm_counter_vals[16]); }
+  if(pwm_counter_vals[17]) { TC_SetRB(TC2, 2, pwm_counter_vals[17]); }
 }
 
 
@@ -337,8 +339,8 @@ void TC8_Handler()
 // - BLDC motor - 3PWM setting
 // - hardware specific
 void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const int pinC) {
-  if(!pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 50khz
-  else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to 50kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency)) ) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 50kHz // TLD order of operations check
+  else { pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); } // constrain to 50kHz max
   // save the pwm frequency
   _pwm_frequency = pwm_frequency;
   // cinfigure pwm pins
@@ -362,8 +364,8 @@ void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const in
 //- Stepper driver - 2PWM setting
 // - hardware specific
 void* _configure2PWM(long pwm_frequency, const int pinA, const int pinB) {
-  if(!pwm_frequency || !_isset(pwm_frequency)) pwm_frequency = _PWM_FREQUENCY; // default frequency 50khz
-  else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to 50kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency))) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 50khz // TLD order of operations check
+  else { pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); } // constrain to 50kHz max
   // save the pwm frequency
   _pwm_frequency = pwm_frequency;
   // cinfigure pwm pins
@@ -386,8 +388,8 @@ void* _configure2PWM(long pwm_frequency, const int pinA, const int pinB) {
 // - Stepper motor - 4PWM setting
 // - hardware speciffic
 void* _configure4PWM(long pwm_frequency,const int pinA, const int pinB, const int pinC, const int pinD) {
-  if(!pwm_frequency || !_isset(pwm_frequency)) pwm_frequency = _PWM_FREQUENCY; // default frequency 50khz
-  else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to 50kHz max
+  if((!pwm_frequency) || (!_isset(pwm_frequency))) { pwm_frequency = _PWM_FREQUENCY; } // default frequency 50kHz // TLD order of operations check
+  else { pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); } // constrain to 50kHz max
   // save the pwm frequency
   _pwm_frequency = pwm_frequency;
   // cinfigure pwm pins
@@ -411,7 +413,7 @@ void* _configure4PWM(long pwm_frequency,const int pinA, const int pinB, const in
 // function setting the pwm duty cycle to the hardware
 // - BLDC motor - 3PWM setting
 // - hardware speciffic
-void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* param){
+void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* param) {
   // transform duty cycle from [0,1] to [0,_max_pwm_value]
   GenericDriverParams* p = (GenericDriverParams*)param;
   setPwm(p->pins[0], _max_pwm_value*dc_a);
@@ -424,7 +426,7 @@ void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* param){
 // function setting the pwm duty cycle to the hardware
 // - Stepper motor - 4PWM setting
 // - hardware speciffic
-void _writeDutyCycle4PWM(float dc_1a,  float dc_1b, float dc_2a, float dc_2b, void* param){
+void _writeDutyCycle4PWM(float dc_1a,  float dc_1b, float dc_2a, float dc_2b, void* param) {
   // transform duty cycle from [0,1] to [0,_max_pwm_value]
   GenericDriverParams* p = (GenericDriverParams*)param;
   setPwm(p->pins[0], _max_pwm_value*dc_1a);
@@ -438,7 +440,7 @@ void _writeDutyCycle4PWM(float dc_1a,  float dc_1b, float dc_2a, float dc_2b, vo
 // Function setting the duty cycle to the pwm pin (ex. analogWrite())
 // - Stepper driver - 2PWM setting
 // - hardware specific
-void  _writeDutyCycle2PWM(float dc_a,  float dc_b, void* param){
+void  _writeDutyCycle2PWM(float dc_a,  float dc_b, void* param) {
   // transform duty cycle from [0,1] to [0,_max_pwm_value]
   GenericDriverParams* p = (GenericDriverParams*)param;
   setPwm(p->pins[0], _max_pwm_value*dc_a);

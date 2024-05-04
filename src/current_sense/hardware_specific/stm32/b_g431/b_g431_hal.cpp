@@ -30,8 +30,7 @@
   * @param None
   * @retval None
   */
-void MX_GPIO_Init(void)
-{
+void MX_GPIO_Init(void) {
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOF_CLK_ENABLE();
@@ -44,8 +43,7 @@ void MX_GPIO_Init(void)
 /** 
   * Enable DMA controller clock
   */
-void  MX_DMA_Init(void) 
-{
+void  MX_DMA_Init(void) {
   /* DMA controller clock enable */
   __HAL_RCC_DMAMUX1_CLK_ENABLE();
   __HAL_RCC_DMA1_CLK_ENABLE();
@@ -72,8 +70,7 @@ void  MX_DMA_Init(void)
   * @param None
   * @retval None
   */
-void  MX_ADC1_Init(ADC_HandleTypeDef* hadc1)
-{
+void  MX_ADC1_Init(ADC_HandleTypeDef* hadc1) {
   /* USER CODE BEGIN ADC1_Init 0 */
 
   /* USER CODE END ADC1_Init 0 */
@@ -102,16 +99,14 @@ void  MX_ADC1_Init(ADC_HandleTypeDef* hadc1)
   hadc1->Init.DMAContinuousRequests = ENABLE;
   hadc1->Init.Overrun = ADC_OVR_DATA_PRESERVED;
 
-  if (HAL_ADC_Init(hadc1) != HAL_OK)
-  {
+  if(HAL_ADC_Init(hadc1) != HAL_OK) {
     SIMPLEFOC_DEBUG("HAL_ADC_Init failed!");
   }
 
   /** Configure the ADC multi-mode 
   */
   multimode.Mode = ADC_MODE_INDEPENDENT;
-  if (HAL_ADCEx_MultiModeConfigChannel(hadc1, &multimode) != HAL_OK)
-  {
+  if(HAL_ADCEx_MultiModeConfigChannel(hadc1, &multimode) != HAL_OK) {
     SIMPLEFOC_DEBUG("HAL_ADCEx_MultiModeConfigChannel failed!");
   }
   /** Configure Regular Channel 
@@ -122,16 +117,14 @@ void  MX_ADC1_Init(ADC_HandleTypeDef* hadc1)
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
   sConfig.Offset = 0;
-  if (HAL_ADC_ConfigChannel(hadc1, &sConfig) != HAL_OK)
-  {
+  if(HAL_ADC_ConfigChannel(hadc1, &sConfig) != HAL_OK) {
     SIMPLEFOC_DEBUG("HAL_ADC_ConfigChannel failed!");
   }
   /** Configure Regular Channel 
   */
   sConfig.Channel = ADC_CHANNEL_3;  // ADC1_IN3 = PA2 = OP1_OUT
   sConfig.Rank = ADC_REGULAR_RANK_2;
-  if (HAL_ADC_ConfigChannel(hadc1, &sConfig) != HAL_OK)
-  {
+  if(HAL_ADC_ConfigChannel(hadc1, &sConfig) != HAL_OK) {
     SIMPLEFOC_DEBUG("HAL_ADC_ConfigChannel failed!");
   }
 
@@ -145,8 +138,7 @@ void  MX_ADC1_Init(ADC_HandleTypeDef* hadc1)
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
   sConfig.Offset = 0;
-  if (HAL_ADC_ConfigChannel(hadc1, &sConfig) != HAL_OK)
-  {
+  if(HAL_ADC_ConfigChannel(hadc1, &sConfig) != HAL_OK) {
     SIMPLEFOC_DEBUG("HAL_ADC_ConfigChannel failed!");
   }
 
@@ -158,8 +150,7 @@ void  MX_ADC1_Init(ADC_HandleTypeDef* hadc1)
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
   sConfig.Offset = 0;
-  if (HAL_ADC_ConfigChannel(hadc1, &sConfig) != HAL_OK)
-  {
+  if(HAL_ADC_ConfigChannel(hadc1, &sConfig) != HAL_OK) {
     SIMPLEFOC_DEBUG("HAL_ADC_ConfigChannel failed!");
   }
 
@@ -171,8 +162,7 @@ void  MX_ADC1_Init(ADC_HandleTypeDef* hadc1)
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
   sConfig.Offset = 0;
-  if (HAL_ADC_ConfigChannel(hadc1, &sConfig) != HAL_OK)
-  {
+  if(HAL_ADC_ConfigChannel(hadc1, &sConfig) != HAL_OK) {
     SIMPLEFOC_DEBUG("HAL_ADC_ConfigChannel failed!");
   }
   /* USER CODE BEGIN ADC1_Init 2 */
@@ -215,8 +205,7 @@ void MX_ADC2_Init(ADC_HandleTypeDef* hadc2)
   hadc2->Init.DMAContinuousRequests = ENABLE;
   hadc2->Init.Overrun = ADC_OVR_DATA_PRESERVED;
 
-  if (HAL_ADC_Init(hadc2) != HAL_OK)
-  {
+  if(HAL_ADC_Init(hadc2) != HAL_OK) {
     SIMPLEFOC_DEBUG("HAL_ADC_Init failed!");
   }
   /** Configure Regular Channel 
@@ -227,8 +216,7 @@ void MX_ADC2_Init(ADC_HandleTypeDef* hadc2)
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
   sConfig.Offset = 0;
-  if (HAL_ADC_ConfigChannel(hadc2, &sConfig) != HAL_OK)
-  {
+  if(HAL_ADC_ConfigChannel(hadc2, &sConfig) != HAL_OK) {
     SIMPLEFOC_DEBUG("HAL_ADC_ConfigChannel failed!");
   }
   /* USER CODE BEGIN ADC2_Init 2 */
@@ -246,8 +234,7 @@ void MX_ADC2_Init(ADC_HandleTypeDef* hadc2)
 void HAL_OPAMP_MspInit(OPAMP_HandleTypeDef* hopamp)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(hopamp->Instance==OPAMP1)
-  {
+  if(hopamp->Instance==OPAMP1) {
   /* USER CODE BEGIN OPAMP1_MspInit 0 */
 
   /* USER CODE END OPAMP1_MspInit 0 */
@@ -266,9 +253,7 @@ void HAL_OPAMP_MspInit(OPAMP_HandleTypeDef* hopamp)
   /* USER CODE BEGIN OPAMP1_MspInit 1 */
 
   /* USER CODE END OPAMP1_MspInit 1 */
-  }
-  else if(hopamp->Instance==OPAMP2)
-  {
+  } else if(hopamp->Instance==OPAMP2) {
   /* USER CODE BEGIN OPAMP2_MspInit 0 */
 
   /* USER CODE END OPAMP2_MspInit 0 */
@@ -287,9 +272,7 @@ void HAL_OPAMP_MspInit(OPAMP_HandleTypeDef* hopamp)
   /* USER CODE BEGIN OPAMP2_MspInit 1 */
 
   /* USER CODE END OPAMP2_MspInit 1 */
-  }
-  else if(hopamp->Instance==OPAMP3)
-  {
+  } else if(hopamp->Instance==OPAMP3) {
   /* USER CODE BEGIN OPAMP3_MspInit 0 */
 
   /* USER CODE END OPAMP3_MspInit 0 */
@@ -320,8 +303,7 @@ void HAL_OPAMP_MspInit(OPAMP_HandleTypeDef* hopamp)
 */
 void HAL_OPAMP_MspDeInit(OPAMP_HandleTypeDef* hopamp)
 {
-  if(hopamp->Instance==OPAMP1)
-  {
+  if(hopamp->Instance==OPAMP1) {
   /* USER CODE BEGIN OPAMP1_MspDeInit 0 */
 
   /* USER CODE END OPAMP1_MspDeInit 0 */
@@ -336,9 +318,7 @@ void HAL_OPAMP_MspDeInit(OPAMP_HandleTypeDef* hopamp)
   /* USER CODE BEGIN OPAMP1_MspDeInit 1 */
 
   /* USER CODE END OPAMP1_MspDeInit 1 */
-  }
-  else if(hopamp->Instance==OPAMP2)
-  {
+  } else if(hopamp->Instance==OPAMP2) {
   /* USER CODE BEGIN OPAMP2_MspDeInit 0 */
 
   /* USER CODE END OPAMP2_MspDeInit 0 */
@@ -353,9 +333,7 @@ void HAL_OPAMP_MspDeInit(OPAMP_HandleTypeDef* hopamp)
   /* USER CODE BEGIN OPAMP2_MspDeInit 1 */
 
   /* USER CODE END OPAMP2_MspDeInit 1 */
-  }
-  else if(hopamp->Instance==OPAMP3)
-  {
+  } else if(hopamp->Instance==OPAMP3) {
   /* USER CODE BEGIN OPAMP3_MspDeInit 0 */
 
   /* USER CODE END OPAMP3_MspDeInit 0 */

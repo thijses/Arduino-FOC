@@ -20,8 +20,7 @@
 
 // AREF pin is 42
 
-class SAMDCurrentSenseADCDMA
-{
+class SAMDCurrentSenseADCDMA {
 
 public:
   static SAMDCurrentSenseADCDMA * getHardwareAPIInstance();

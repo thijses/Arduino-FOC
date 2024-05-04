@@ -3,7 +3,7 @@
 
 // if the mcu doen't have defiend analogWrite
 #if defined(ESP_H) && defined(ARDUINO_ARCH_ESP32) && !defined(analogWrite)
-  __attribute__((weak)) void analogWrite(uint8_t pin, int value){ };
+  __attribute__((weak)) void analogWrite(uint8_t pin, int value) {};
 #endif
 
 // function setting the high pwm frequency to the supplied pin
@@ -15,7 +15,7 @@ __attribute__((weak)) void* _configure1PWM(long pwm_frequency, const int pinA) {
     .pins = { pinA },
     .pwm_frequency = pwm_frequency
   };
-  return params;
+  return(params);
 }
 
 // function setting the high pwm frequency to the supplied pins
@@ -27,7 +27,7 @@ __attribute__((weak)) void* _configure2PWM(long pwm_frequency,const int pinA, co
     .pins = { pinA, pinB },
     .pwm_frequency = pwm_frequency
   };
-  return params;
+  return(params);
 }
 
 // function setting the high pwm frequency to the supplied pins
@@ -39,7 +39,7 @@ __attribute__((weak)) void* _configure3PWM(long pwm_frequency,const int pinA, co
     .pins = { pinA, pinB, pinC },
     .pwm_frequency = pwm_frequency
   };
-  return params;
+  return(params);
 }
 
 
@@ -52,7 +52,7 @@ __attribute__((weak)) void* _configure4PWM(long pwm_frequency, const int pin1A, 
     .pins = { pin1A, pin1B, pin2A, pin2B },
     .pwm_frequency = pwm_frequency
   };
-  return params;
+  return(params);
 }
 
 // Configuring PWM frequency, resolution and alignment
@@ -68,7 +68,7 @@ __attribute__((weak)) void* _configure6PWM(long pwm_frequency, float dead_zone, 
   _UNUSED(pinC_h);
   _UNUSED(pinC_l);
 
-  return SIMPLEFOC_DRIVER_INIT_FAILED;
+  return(SIMPLEFOC_DRIVER_INIT_FAILED);
 }
 
 
