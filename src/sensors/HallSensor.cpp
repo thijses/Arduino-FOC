@@ -45,24 +45,46 @@ void HallSensor::updateState() {
   long new_pulse_timestamp = _micros();
 
   int8_t new_hall_state = C_active + (B_active << 1) + (A_active << 2);
-
-  // glitch avoidance #1 - sometimes we get an interrupt but pins haven't changed
-  if(new_hall_state == hall_state) {
+  //// TLD debug:
+  static bool pin40State;
+  if((new_hall_state == (0b000)) || (new_hall_state == (0b111))) { // TLD addition: if state is impossible
+    log_d("%u bad state %u%u%u -> %u%u%u", pinA, (hall_state&0b100)>>2,(hall_state&0b010)>>1,hall_state&0b001, (new_hall_state&0b100)>>2,(new_hall_state&0b010)>>1,new_hall_state&0b001); // TLD debug
+    digitalWrite(40, pin40State=!pin40State); // toggle debug pin
+    return;
+  } else if(new_hall_state == hall_state) { // glitch avoidance #1 - sometimes we get an interrupt but pins haven't changed
+    log_d("%u no state change %u%u%u", pinA, (hall_state&0b100)>>2,(hall_state&0b010)>>1,hall_state&0b001); // TLD debug, deleteme
+    digitalWrite(40, pin40State=!pin40State); // toggle debug pin
     return;
   }
   hall_state = new_hall_state;
 
   int8_t new_electric_sector = ELECTRIC_SECTORS[hall_state];
-  if(new_electric_sector - electric_sector > 3) {
+  //// TLD debug:
+  if(new_electric_sector == (-1)) { // if state is impossible
+    log_d("%u bad state %u & %u%u%u", pinA, electric_sector, (hall_state&0b100)>>2,(hall_state&0b010)>>1,hall_state&0b001);
+    // digitalWrite(40, pin40State=!pin40State); // toggle debug pin
+  }
+  if(abs(new_electric_sector-electric_sector) > 1) { // if step is weird
+    if(abs(new_electric_sector-electric_sector) != 5) { // if it's NOT a normal rollover
+      log_d("%u skipped state %u -> %u", pinA, electric_sector, new_electric_sector);
+      // static bool pinState; digitalWrite(40, pinState=!pinState); // toggle debug pin
+    }
+  }
+
+  if((new_electric_sector - electric_sector) > 3) {
     //underflow
     direction = Direction::CCW;
     electric_rotations += direction;
-  } else if(new_electric_sector - electric_sector < (-3)) {
+  } else if((new_electric_sector - electric_sector) < (-3)) {
     //overflow
     direction = Direction::CW;
     electric_rotations += direction;
   } else {
     direction = (new_electric_sector > electric_sector)? Direction::CW : Direction::CCW;
+  }
+  if(direction != old_direction) { // TLD debug, deleteme
+    // log_d("%u dir change %u -> %d", pinA, electric_sector, new_electric_sector);
+    static bool pinState; digitalWrite(42, pinState=!pinState); // toggle debug pin
   }
   electric_sector = new_electric_sector;
 
@@ -127,7 +149,7 @@ float HallSensor::getVelocity() {
   if((last_pulse_diff == 0) || ((long)(_micros() - last_pulse_timestamp) > last_pulse_diff*2) ) { // last velocity isn't accurate if too old // TLD order of operations check
     return(0);
   } else {
-    return(direction * (_2PI / (float)cpr) / (last_pulse_diff / 1000000.0f));
+    return((direction * (_2PI / (float)cpr)) / (last_pulse_diff / 1000000.0f)); // TLD order of operations check
   }
 
 }

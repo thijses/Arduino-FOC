@@ -405,7 +405,7 @@ void BLDCMotor::move(float new_target) {
   //                        Additionally, the way LPF works on angle is a precision issue, and the angle-LPF is a problem
   //                        when switching to a 2-component representation.
   if((controller!=MotionControlType::angle_openloop) && (controller!=MotionControlType::velocity_openloop) \
-    /*  && (controller!=MotionControlType::velocity) && (controller!=MotionControlType::torque) */) { // TLD minor optimization
+      && (controller!=MotionControlType::velocity) && (controller!=MotionControlType::torque)) { // TLD minor optimization (note: will require change to example code 'virtual link')
     shaft_angle = shaftAngle(); // read value even if motor is disabled to keep the monitoring updated but not in openloop mode
   }
 
