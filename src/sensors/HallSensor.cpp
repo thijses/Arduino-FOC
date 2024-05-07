@@ -42,32 +42,50 @@ void HallSensor::handleC() {
  * Updates the state and sector following an interrupt
  */
 void HallSensor::updateState() {
+  //static bool fixGlitchNextTime=false;
+  //if(fixGlitchNextTime) { fixGlitchNextTime=false; A_active=digitalRead(pinA);B_active=digitalRead(pinB);C_active=digitalRead(pinC); }
   long new_pulse_timestamp = _micros();
 
   int8_t new_hall_state = C_active + (B_active << 1) + (A_active << 2);
   //// TLD debug:
   static bool pin40State;
   if((new_hall_state == (0b000)) || (new_hall_state == (0b111))) { // TLD addition: if state is impossible
-    log_d("%u bad state %u%u%u -> %u%u%u", pinA, (hall_state&0b100)>>2,(hall_state&0b010)>>1,hall_state&0b001, (new_hall_state&0b100)>>2,(new_hall_state&0b010)>>1,new_hall_state&0b001); // TLD debug
-    digitalWrite(40, pin40State=!pin40State); // toggle debug pin
-    return;
+    // digitalWrite(40, pin40State=!pin40State); // toggle debug pin
+    int8_t bad_state = new_hall_state; // record for debug
+    A_active=digitalRead(pinA); B_active=digitalRead(pinB); C_active=digitalRead(pinC); // re-read all pins
+    new_hall_state = C_active + (B_active << 1) + (A_active << 2); // attempt to recover
+    if((new_hall_state == (0b000)) || (new_hall_state == (0b111))) { // if glitch persists
+      log_d("%u bad state %u%u%u -> %u%u%u", pinA, (hall_state&0b100)>>2,(hall_state&0b010)>>1,hall_state&0b001, (new_hall_state&0b100)>>2,(new_hall_state&0b010)>>1,new_hall_state&0b001); // TLD debug
+      //fixGlitchNextTime=true; // try to fix glitch at next interrupt
+      return; // glitch was not fixed, quit
+    } else { // if glitch was fixed
+      log_d("\t%u bad-state glitch fixed %u%u%u -> %u%u%u", pinA, (bad_state&0b100)>>2,(bad_state&0b010)>>1,bad_state&0b001, (new_hall_state&0b100)>>2,(new_hall_state&0b010)>>1,new_hall_state&0b001); // TLD debug, deleteme
+    }
   } else if(new_hall_state == hall_state) { // glitch avoidance #1 - sometimes we get an interrupt but pins haven't changed
-    log_d("%u no state change %u%u%u", pinA, (hall_state&0b100)>>2,(hall_state&0b010)>>1,hall_state&0b001); // TLD debug, deleteme
-    digitalWrite(40, pin40State=!pin40State); // toggle debug pin
-    return;
+    // digitalWrite(40, pin40State=!pin40State); // toggle debug pin
+    int8_t bad_state = new_hall_state; // record for debug
+    A_active=digitalRead(pinA); B_active=digitalRead(pinB); C_active=digitalRead(pinC); // re-read all pins
+    new_hall_state = C_active + (B_active << 1) + (A_active << 2); // attempt to recover
+    if(new_hall_state == hall_state) { // if glitch persists
+      log_d("%u no state change %u%u%u", pinA, (hall_state&0b100)>>2,(hall_state&0b010)>>1,hall_state&0b001); // TLD debug, deleteme
+      //fixGlitchNextTime=true; // try to fix glitch at next interrupt
+      return; // glitch was not fixed, quit
+    } else { // if glitch was fixed
+      log_d("\t%u no-state-change glitch fixed %u%u%u -> %u%u%u", pinA, (bad_state&0b100)>>2,(bad_state&0b010)>>1,new_hall_state&0b001, (new_hall_state&0b100)>>2,(new_hall_state&0b010)>>1,new_hall_state&0b001); // TLD debug, deleteme
+    }
   }
   hall_state = new_hall_state;
 
   int8_t new_electric_sector = ELECTRIC_SECTORS[hall_state];
   //// TLD debug:
   if(new_electric_sector == (-1)) { // if state is impossible
-    log_d("%u bad state %u & %u%u%u", pinA, electric_sector, (hall_state&0b100)>>2,(hall_state&0b010)>>1,hall_state&0b001);
     // digitalWrite(40, pin40State=!pin40State); // toggle debug pin
+    log_d("%u (SECOND CHECK) bad state %u & %u%u%u", pinA, electric_sector, (hall_state&0b100)>>2,(hall_state&0b010)>>1,hall_state&0b001);
   }
   if(abs(new_electric_sector-electric_sector) > 1) { // if step is weird
     if(abs(new_electric_sector-electric_sector) != 5) { // if it's NOT a normal rollover
+      digitalWrite(40, pin40State=!pin40State); // toggle debug pin
       log_d("%u skipped state %u -> %u", pinA, electric_sector, new_electric_sector);
-      // static bool pinState; digitalWrite(40, pinState=!pinState); // toggle debug pin
     }
   }
 
@@ -83,8 +101,8 @@ void HallSensor::updateState() {
     direction = (new_electric_sector > electric_sector)? Direction::CW : Direction::CCW;
   }
   if(direction != old_direction) { // TLD debug, deleteme
-    // log_d("%u dir change %u -> %d", pinA, electric_sector, new_electric_sector);
     static bool pinState; digitalWrite(42, pinState=!pinState); // toggle debug pin
+    // log_d("%u dir change %u -> %d", pinA, electric_sector, new_electric_sector);
   }
   electric_sector = new_electric_sector;
 
@@ -118,11 +136,14 @@ void HallSensor::attachSectorCallback(void (*_onSectorChange)(int sector)) {
 // Sensor update function. Safely copy volatile interrupt variables into Sensor base class state variables.
 void HallSensor::update() {
   // Copy volatile variables in minimal-duration blocking section to ensure no interrupts are missed
+  // static bool pin40State, pin42State = false; // TLD debug, deleteme
+  // digitalWrite(40, pin40State=!pin40State); // toggle debug pin
   noInterrupts();
   angle_prev_ts = pulse_timestamp;
   long last_electric_rotations = electric_rotations;
   int8_t last_electric_sector = electric_sector;
   interrupts();
+  // digitalWrite(42, pin42State=!pin42State); // toggle debug pin
   angle_prev = ((float)((last_electric_rotations * 6 + last_electric_sector) % cpr) / (float)cpr) * _2PI ;
   full_rotations = (int32_t)((last_electric_rotations * 6 + last_electric_sector) / cpr);
 }
