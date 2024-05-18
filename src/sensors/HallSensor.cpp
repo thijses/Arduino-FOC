@@ -42,12 +42,15 @@ void HallSensor::handleC() {
  * Updates the state and sector following an interrupt
  */
 void HallSensor::updateState() {
+  // static bool pin40State, pin42State; // TLB debug, deleteme
+  // digitalWrite(40, pin40State=!pin40State); // toggle debug pin // DELETEME
+
   long new_pulse_timestamp = _micros();
 
-  if(_glitchFixTimestamp) { A_active=digitalRead(pinA);B_active=digitalRead(pinB);C_active=digitalRead(pinC); }
+  if(_glitchFixTimestamp) { A_active=digitalRead(pinA);B_active=digitalRead(pinB);C_active=digitalRead(pinC); } // if there are some unresolved interrupt/state issues from last time, try to solve them now
+
   int8_t new_hall_state = C_active + (B_active << 1) + (A_active << 2);
-  //// TLD debug:
-  static bool pin40State;
+
   if((new_hall_state == (0b000)) || (new_hall_state == (0b111))) { // TLD addition: if state is impossible
     // digitalWrite(40, pin40State=!pin40State); // toggle debug pin // DELETEME
     int8_t bad_state = new_hall_state; // record for debug
@@ -58,7 +61,8 @@ void HallSensor::updateState() {
       if(!_glitchFixTimestamp) {_glitchFixTimestamp=millis();} // try to fix glitch at next interrupt or update()
       return; // glitch was not fixed, quit
     } else { // if glitch was fixed
-      log_v("\t%u bad-state glitch fixed %u%u%u -> %u%u%u", pinA, (bad_state&0b100)>>2,(bad_state&0b010)>>1,bad_state&0b001, (new_hall_state&0b100)>>2,(new_hall_state&0b010)>>1,new_hall_state&0b001); // TLD debug, deleteme
+      // digitalWrite(42, pin40State=!pin40State); // toggle debug pin // DELETEME
+      //log_v("\t%u bad-state glitch fixed %u%u%u -> %u%u%u", pinA, (bad_state&0b100)>>2,(bad_state&0b010)>>1,bad_state&0b001, (new_hall_state&0b100)>>2,(new_hall_state&0b010)>>1,new_hall_state&0b001); // TLD debug, deleteme
     }
   } else if(new_hall_state == hall_state) { // glitch avoidance #1 - sometimes we get an interrupt but pins haven't changed
     // digitalWrite(40, pin40State=!pin40State); // toggle debug pin // DELETEME
@@ -70,7 +74,8 @@ void HallSensor::updateState() {
       if(!_glitchFixTimestamp) {_glitchFixTimestamp=millis();} // try to fix glitch at next interrupt or update()
       return; // glitch was not fixed, quit
     } else { // if glitch was fixed
-      log_v("\t%u no-state-change glitch fixed %u%u%u -> %u%u%u", pinA, (bad_state&0b100)>>2,(bad_state&0b010)>>1,bad_state&0b001, (new_hall_state&0b100)>>2,(new_hall_state&0b010)>>1,new_hall_state&0b001); // TLD debug, deleteme
+      // digitalWrite(42, pin40State=!pin40State); // toggle debug pin // DELETEME
+      //log_v("\t%u no-state-change glitch fixed %u%u%u -> %u%u%u", pinA, (bad_state&0b100)>>2,(bad_state&0b010)>>1,bad_state&0b001, (new_hall_state&0b100)>>2,(new_hall_state&0b010)>>1,new_hall_state&0b001); // TLD debug, deleteme
     }
   }
   hall_state = new_hall_state;
@@ -99,7 +104,7 @@ void HallSensor::updateState() {
     direction = (new_electric_sector > electric_sector)? Direction::CW : Direction::CCW;
   }
   if(direction != old_direction) { // TLD debug, deleteme
-    static bool pinState; digitalWrite(42, pinState=!pinState); // toggle debug pin // DELETEME
+    // static bool pinState; digitalWrite(42, pinState=!pinState); // toggle debug pin // DELETEME
     // log_v("%u dir change %u -> %d", pinA, electric_sector, new_electric_sector);
   }
   electric_sector = new_electric_sector;
