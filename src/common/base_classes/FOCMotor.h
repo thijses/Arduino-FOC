@@ -84,6 +84,10 @@ class FOCMotor
     /** Motor enable function */
     virtual void enable()=0;
 
+    /** Motor freeWheel function (experimental!!!) */
+    virtual void freeWheel()=0;
+
+
     /**
      * Function linking a motor and a sensor 
      * 

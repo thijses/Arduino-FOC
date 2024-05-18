@@ -92,6 +92,19 @@ void BLDCDriver6PWM::setPwm(float Ua, float Ub, float Uc) {
   _writeDutyCycle6PWM(dc_a, dc_b, dc_c, phase_state, params);
 }
 
+void BLDCDriver6PWM::freeWheel() {
+  // disable(); // doesn't really make sense, i think
+  phase_state[0] = PhaseState::PHASE_ON;
+  phase_state[1] = PhaseState::PHASE_ON;
+  phase_state[2] = PhaseState::PHASE_ON;
+  //// set to a (presumably illigal) state, and pray to god
+  dc_a = 1.0f;
+  dc_b = 1.0f;
+  dc_c = 1.0f;
+  // hardware specific writing
+  // hardware specific function - depending on driver and mcu
+  _writeDutyCycle6PWM(dc_a, dc_b, dc_c, phase_state, params);
+}
 
 // Set the phase state
 // actually changing the state is only done on the next call to setPwm, and depends

@@ -29,6 +29,9 @@ class BLDCDriver3PWM: public BLDCDriver {
     void disable() override;
     /** Motor enable function */
     void enable() override;
+    
+    /** freeWheel is a 6-PWM exclusive function (unless (_isset(enableA_pin)&&_isset(enableB_pin)&&_isset(enableC_pin)) maybe?), so just redirect to disable() */
+    void freeWheel() override { disable(); }
 
     // hardware variables
     int pwmA; //!< phase A pwm pin number

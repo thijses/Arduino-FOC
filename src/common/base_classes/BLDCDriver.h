@@ -22,6 +22,9 @@ class BLDCDriver {
         /** Disable hardware */
         virtual void disable() = 0;
 
+        /** freeWheel (experimental!!! and 6-PWM mode only)*/
+        virtual void freeWheel() = 0;
+
         long pwm_frequency; //!< pwm frequency value in hertz
         float voltage_power_supply; //!< power supply voltage
         float voltage_limit; //!< limiting voltage set to the motor

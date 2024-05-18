@@ -45,6 +45,9 @@ class BLDCMotor: public FOCMotor
     /** Motor enable function */
     void enable() override;
 
+    /** Motor freeWheel function (experimental!!!) */
+    void freeWheel() override;
+
     /**
      * Function initializing FOC algorithm
      * and aligning sensor's and motors' zero position 

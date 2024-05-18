@@ -93,6 +93,8 @@ class HallSensor: public Sensor{
 
     volatile long pulse_diff;
     
+    volatile uint32_t _glitchFixTimestamp = 0; // (explicitely zero-init) stores millis() timestamp when interrupt glitch is detected. Reset to zero when resolved
+    const uint32_t _glitchFixTimeout = 5; // (millis) if interrupt glitch is not 'fixed' within this timeframe, then stop trying
 };
 
 

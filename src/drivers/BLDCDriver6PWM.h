@@ -31,6 +31,9 @@ class BLDCDriver6PWM: public BLDCDriver {
     /** Motor enable function */
     void enable() override;
 
+    /** Motor freeWheel function (experimental!!!) */
+    void freeWheel() override;
+
     // hardware variables
     int pwmA_h,pwmA_l; //!< phase A pwm pin number
     int pwmB_h,pwmB_l; //!< phase B pwm pin number

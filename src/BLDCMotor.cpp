@@ -110,8 +110,7 @@ void BLDCMotor::init() {
 
 
 // disable motor driver
-void BLDCMotor::disable()
-{
+void BLDCMotor::disable() {
   // disable the current sense
   if(current_sense) { current_sense->disable(); }
   // set zero to PWM
@@ -122,8 +121,7 @@ void BLDCMotor::disable()
   enabled = 0;
 }
 // enable motor driver
-void BLDCMotor::enable()
-{
+void BLDCMotor::enable() {
   // enable the driver
   driver->enable();
   // set zero to PWM
@@ -137,6 +135,11 @@ void BLDCMotor::enable()
   PID_current_d.reset();
   // motor status update
   enabled = 1;
+}
+// enable free-wheeling (experimental!!!)
+void BLDCMotor::freeWheel() {
+  driver->freeWheel();
+  enabled = 0;
 }
 
 /**
